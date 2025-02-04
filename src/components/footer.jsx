@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 const Footer = () => {
   const [subEmail, setSubEmail] = useState("");
   const [subError, setSubError] = useState("");

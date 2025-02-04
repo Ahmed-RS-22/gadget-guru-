@@ -1,46 +1,44 @@
-import React, {  useEffect, useRef, useState } from "react";
-import { Link,  useNavigate, useLocation } from "react-router-dom";
-import logo from "../assets/images/logo-1.png"
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import logo from "../assets/images/logo-1.png";
 import "../styles/models.css"; // Assuming your CSS file for styling
 import axios from "axios";
 
-const Header = ({ isUserLogged, onLogout }) => {  
+const Header = ({ isUserLogged, onLogout }) => {
   const darkRef = useRef();
   const navigate = useNavigate();
   const location = useLocation();
-  const token =location.state?.user || JSON.parse(localStorage.getItem("userInfo"))
-  const [myuser,setMyuser] = useState( {});
-  const [isDark, setIsDark] = useState(false);  
-  const [count, setCount] = useState(2);  
-  const [userInfo , setUserInfo] = useState({
+  const token =
+    location.state?.user || JSON.parse(localStorage.getItem("userInfo"));
+  const [myuser, setMyuser] = useState({});
+  const [isDark, setIsDark] = useState(false);
+  const count = 2;
+  const [userInfo, setUserInfo] = useState({
     token: JSON.parse(localStorage.getItem("userInfo"))?.token,
-    isUserLoggedIn: JSON.parse(localStorage.getItem("userInfo"))?.isUserLoggedIn,
+    isUserLoggedIn: JSON.parse(localStorage.getItem("userInfo"))
+      ?.isUserLoggedIn,
   });
-  useEffect(()=>{
-
-  },[count])
+  useEffect(() => {}, [count]);
   const getUserInfo = async () => {
-    if(JSON.parse(localStorage.getItem("userInfo")).isUserLoggedIn ||  token){
-    try {
-      const response = await axios
-        .get("https://gadetguru.mgheit.com/api/profile", {
-          headers: {
-            Authorization: `Bearer ${token.token }`,
-            Accept: "application/json",
-          },
-        })
-        .then((res) => {
-          const result = res.data.data
-          setMyuser(result)
-        });
-    } catch (error) {
-      console.log(error);
+    if (JSON.parse(localStorage.getItem("userInfo")).isUserLoggedIn || token) {
+      try {
+        const response = await axios
+          .get("https://gadetguru.mgheit.com/api/profile", {
+            headers: {
+              Authorization: `Bearer ${token.token}`,
+              Accept: "application/json",
+            },
+          })
+            const result = response.data.data;
+            setMyuser(result);
+      } catch (error) {
+        console.log(error);
+      }
     }
-  }
   };
   useEffect(() => {
-      getUserInfo();
-  },[userInfo] );
+    getUserInfo();
+  }, [userInfo]);   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const handleNavigation = (path, sectionId) => {
     if (location.pathname === path) {
@@ -145,40 +143,39 @@ const Header = ({ isUserLogged, onLogout }) => {
   });
   const handlelogout = async () => {
     // sending token  to api endpoint
-    try{
-
+    try {
       const response = await fetch("https://gadetguru.mgheit.com/api/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
           Authorization: `Bearer ${token?.token} `,
-      },
-    });
-    console.log(response);
+        },
+      });
+      console.log(response);
 
-    if (!response.ok) {
-      throw new Error("Logout failed.");
+      if (!response.ok) {
+        throw new Error("Logout failed.");
+      }
+      const result = await response.json();
+      console.log("Success:", result);
+
+      // set the user login status to false
+      setUserInfo({
+        token: "",
+        isUserLoggedIn: false,
+      }); // redirect to login page
+      setMyuser({
+        ...myuser,
+        is_verified: false,
+        token: "",
+      });
+      onLogout();
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
     }
-    const result = await response.json();
-    console.log("Success:", result);
-    
-    // set the user login status to false
-    setUserInfo({
-      token: "",
-      isUserLoggedIn: false,
-    }); // redirect to login page
-    setMyuser({
-      ...myuser,
-      is_verified:false,
-      token:""
-    })
-    onLogout();
-    navigate("/login");
-  }catch(error){
-    console.error(error);
-  }
-}
+  };
   useEffect(() => {
     if (userInfo) {
       localStorage.setItem("userInfo", JSON.stringify(userInfo));
@@ -204,8 +201,8 @@ const Header = ({ isUserLogged, onLogout }) => {
       document.body.classList.remove("dark");
       setIsDark(false);
     }
-  };  
-  if ( myuser?.is_verified || isUserLogged ) {
+  };
+  if (myuser?.is_verified || isUserLogged) {
     return (
       <header className="header">
         <div className="container">
@@ -295,7 +292,9 @@ const Header = ({ isUserLogged, onLogout }) => {
                     </div>
                     <div className="user-detailes">
                       <span className="name">
-                        {myuser.first_name ? myuser.first_name + " " + myuser.last_name : "username"}
+                        {myuser.first_name
+                          ? myuser.first_name + " " + myuser.last_name
+                          : "username"}
                       </span>
                       <span className="email">{myuser?.email}</span>
                     </div>
@@ -362,9 +361,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                   </div>
                 </div>
               </li>
-              <span>
-                {myuser?.first_name || "username"}
-              </span>
+              <span>{myuser?.first_name || "username"}</span>
             </ul>
           </div>
 
@@ -374,95 +371,97 @@ const Header = ({ isUserLogged, onLogout }) => {
         </div>
       </header>
     );
-  }
-else{
-  return (
-    <>
-      <header className="header">
-        <div className="container">
-          {/* Logo */}
-          <div className="logo">
-            <img src={logo} alt="logo" className="logo" />
-          </div>
+  } else {
+    return (
+      <>
+        <header className="header">
+          <div className="container">
+            {/* Logo */}
+            <div className="logo">
+              <img src={logo} alt="logo" className="logo" />
+            </div>
 
-          {/* Navbar */}
-          <nav className="navbar">
-            <ul className={`nav-links ${showNav ? "show" : ""}`} id="navLinks">
-              <li className="link">
-                <a
-                  className="active"
-                  onClick={() => handleNavigation("/home", "home-Section")}
-                  name="home-Section"
-                >
-                  Home
-                </a>
-              </li>
-              <li className="link">
-                <a
-                  onClick={() => handleNavigation("/home", "about-us")}
-                  name="about-us"
-                >
-                  About US
-                </a>
-              </li>
-              <li className="link">
+            {/* Navbar */}
+            <nav className="navbar">
+              <ul
+                className={`nav-links ${showNav ? "show" : ""}`}
+                id="navLinks"
+              >
+                <li className="link">
+                  <a
+                    className="active"
+                    onClick={() => handleNavigation("/home", "home-Section")}
+                    name="home-Section"
+                  >
+                    Home
+                  </a>
+                </li>
+                <li className="link">
+                  <a
+                    onClick={() => handleNavigation("/home", "about-us")}
+                    name="about-us"
+                  >
+                    About US
+                  </a>
+                </li>
+                <li className="link">
+                  <a
+                    onClick={() => handleNavigation("/home", "ic-id")}
+                    name="ic-id"
+                  >
+                    Services
+                  </a>
+                </li>
+                <li className="link">
+                  <a
+                    onClick={() => handleNavigation("/home", "contactUS")}
+                    name="contactUS"
+                  >
+                    Contact Us
+                  </a>
+                </li>
+              </ul>
+
+              {/* Search */}
+              <div className="search">
                 <a
                   onClick={() => handleNavigation("/home", "ic-id")}
                   name="ic-id"
                 >
-                  Services
+                  <Link
+                    to={{ hash: "#searching" }}
+                    style={{
+                      padding: "0",
+                      border: "none",
+                      textDecoration: "none",
+                    }}
+                  >
+                    search
+                  </Link>
+                  <i className="fa-solid fa-magnifying-glass"></i>
                 </a>
-              </li>
-              <li className="link">
-                <a
-                  onClick={() => handleNavigation("/home", "contactUS")}
-                  name="contactUS"
-                >
-                  Contact Us
-                </a>
-              </li>
-            </ul>
+                {/* <input type="text" name="search" id="search" placeholder="search" /> */}
+              </div>
+            </nav>
 
-            {/* Search */}
-            <div className="search">
-              <a
-                onClick={() => handleNavigation("/home", "ic-id")}
-                name="ic-id"
-              >
-                <Link
-                  to={{ hash: "#searching" }}
-                  style={{
-                    padding: "0",
-                    border: "none",
-                    textDecoration: "none",
-                  }}
-                >
-                  search
-                </Link>
-                <i className="fa-solid fa-magnifying-glass"></i>
-              </a>
-              {/* <input type="text" name="search" id="search" placeholder="search" /> */}
+            {/* User Actions */}
+            <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
+              <Link to="/login" className="signin" id="signIn">
+                Sign In
+              </Link>
+              <Link to="/register" className="register" id="Reg">
+                Sign Up
+              </Link>
             </div>
-          </nav>
 
-          {/* User Actions */}
-          <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
-            <Link to="/login" className="signin" id="signIn">
-              Sign In
-            </Link>
-            <Link to="/register" className="register" id="Reg">
-              Sign Up
-            </Link>
+            {/* Icons */}
+            <i className="fa fa-user" onClick={toggleUserMenu}></i>
+            <i className="fa fa-bars" onClick={toggleNav}></i>
           </div>
-
-          {/* Icons */}
-          <i className="fa fa-user" onClick={toggleUserMenu}></i>
-          <i className="fa fa-bars" onClick={toggleNav}></i>
-        </div>
-      </header>{" "}
-    </>
-  );
-}
+        </header>{" "}
+      </>
+    );
+  }
 };
 
 export default Header;

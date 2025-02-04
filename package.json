@@ -4,11 +4,16 @@
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.1",
+    "@jridgewell/sourcemap-codec": "^1.5.0",
+    "@rollup/plugin-terser": "^0.4.4",
     "axios": "^1.7.9",
     "lucide-react": "^0.474.0",
+    "main": "^1000.0.1",
+    "origin": "^0.5.8",
+    "push": "^0.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^3.0.1",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
     "tesseract.js": "^5.1.1"

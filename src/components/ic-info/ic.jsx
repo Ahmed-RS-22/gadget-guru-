@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, Outlet, useParams, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useParams, useLocation } from "react-router-dom";
 import "../../styles/models.css";
 import SliderImages from "./slider";
 import TruthTable from "./truthtable";
@@ -8,7 +8,6 @@ import axios from "axios";
 const IcInfo = () => {
   const { Slug } = useParams();
   const location = useLocation();
-  const navigate = useNavigate();
   const [id, setId] = useState(location.state?.id);
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false); // Controls fade effect
