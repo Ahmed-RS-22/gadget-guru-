@@ -1,0 +1,246 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+ body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: rgb(249, 250, 251);
+  color: rgb(17, 24, 39);
+}
+
+/* Layout */
+.manin-section{
+  margin-top: 80px;
+}
+.manin-section .container {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.manin-section .container .content {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.manin-section .container .card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.header-gradient {
+  height: 8rem;
+  background: linear-gradient(to right, rgb(219, 234, 254), rgb(254, 249, 195));
+}
+
+.card-body {
+  padding: 1.5rem 2rem;
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 4rem;
+  height: 4rem;
+  background-color: rgb(229, 231, 235);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar svg {
+  width: 2rem;
+  height: 2rem;
+  color: rgb(107, 114, 128);
+}
+
+.user-details {
+  margin-left: 1rem;
+}
+
+.user-name {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.user-email {
+  font-size: 0.875rem;
+  color: rgb(107, 114, 128);
+}
+
+/* Buttons */
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button-primary {
+  background-color: rgb(59, 130, 246);
+  color: white;
+}
+
+.button-primary:hover {
+  background-color: rgb(37, 99, 235);
+}
+
+.button-secondary {
+  background-color: rgb(243, 244, 246);
+  color: rgb(75, 85, 99);
+}
+
+.button-secondary:hover {
+  background-color: rgb(229, 231, 235);
+}
+
+.button-outline {
+  background-color: rgb(239, 246, 255);
+  color: rgb(59, 130, 246);
+}
+
+.button-outline:hover {
+  background-color: rgb(219, 234, 254);
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.section-description {
+  font-size: 0.875rem;
+  color: rgb(107, 114, 128);
+  margin-bottom: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(55, 65, 81);
+  margin-bottom: 0.25rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  padding-left: 2.5rem;
+  border: 1px solid rgb(209, 213, 219);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: rgb(59, 130, 246);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input:disabled,
+.form-select:disabled {
+  background-color: rgb(249, 250, 251);
+  cursor: not-allowed;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  color: rgb(156, 163, 175);
+}
+
+/* Password Fields */
+.password-input {
+  padding-right: 2.5rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.password-toggle svg {
+  width: 1rem;
+  height: 1rem;
+  color: rgb(107, 114, 128);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .button-group {
+    width: 100%;
+  }
+  
+  .button {
+    flex: 1;
+  }
+}
