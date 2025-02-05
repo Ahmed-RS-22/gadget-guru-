@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // For navigation
-import "../../styles/all.css";
-import "../../styles/forms.css";
-import logo from "../../assets/images/logo-1.png"
-import passchange from "../../assets/images/pass-changed.gif" 
+import "../styles/forms.css";
+import logo from "../assets/logo-1.png"
+import passchange from "../assets/pass-changed.gif" 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

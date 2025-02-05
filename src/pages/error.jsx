@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import errorImg from "../assets/images/erorr.png"
-import "../styles/models.css"; // Assuming your CSS file for styling
+import errorImg from "../assets/erorr.png"
+import "../styles/models.css"; 
 const ErrorPage = () => {
   return (
     <main>

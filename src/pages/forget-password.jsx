@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For navigation
-import "../../styles/all.css";
-import "../../styles/forms.css";
-import logo from "../../assets/images/logo-1.png"
+import "../styles/forms.css";
+import logo from "../assets/logo-1.png"
 
 
 const ForgetPassword = () => {

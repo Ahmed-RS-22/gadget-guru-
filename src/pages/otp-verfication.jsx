@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "../../styles/all.css";
-import "../../styles/forms.css";
-import logo from "../../assets/images/logo-1.png"
+import "../styles/forms.css";
+import logo from "../assets/logo-1.png"
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));

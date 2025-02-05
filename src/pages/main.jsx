@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "../styles/main.css";
 import { useLocation,useNavigate } from "react-router-dom";
-import home from "../assets/images/home-1.png"
-import about from "../assets/images/about.png"
-import card1 from "../assets/images/card-1.png"
-import card2 from "../assets/images/card-2.png"
-import card3 from "../assets/images/card-3.png"
-import card4 from "../assets/images/card-4.png"
-import team1 from "../assets/images/team-1.jpg"
+import home from "../assets/home-1.png"
+import about from "../assets/about.png"
+import card1 from "../assets/card-1.png"
+import card2 from "../assets/card-2.png"
+import card3 from "../assets/card-3.png"
+import card4 from "../assets/card-4.png"
+import team1 from "../assets/team-1.jpg"
 import axios from "axios";
 import Search from "../components/search";
-
+import "@fortawesome/fontawesome-free/css/all.min.css";
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();

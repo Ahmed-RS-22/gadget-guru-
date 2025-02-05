@@ -1,7 +1,7 @@
 import React, { useRef, useState ,useEffect} from "react";
 import "../styles/forms.css";
 import { useNavigate,Link } from "react-router-dom";
-import logo from "../assets/images/logo-1.png"
+import logo from "../assets/logo-1.png"
 const Login = ({ onLogin }) => {
   // Refs for form inputs
   const emailRef = useRef();

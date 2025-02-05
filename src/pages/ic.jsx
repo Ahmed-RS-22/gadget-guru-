@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, useParams, useLocation } from "react-router-dom";
-import "../../styles/models.css";
-import SliderImages from "./slider";
-import TruthTable from "./truthtable";
+import "../styles/models.css";
+import SliderImages from "../components/slider"
+import TruthTable from "../components/truthtable";
 import axios from "axios";
-
+import "@fortawesome/fontawesome-free/css/all.min.css";
 const IcInfo = () => {
   const { Slug } = useParams();
   const location = useLocation();

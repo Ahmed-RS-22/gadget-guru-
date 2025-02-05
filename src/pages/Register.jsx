@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import "../styles/forms.css";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import logo from "../assets/images/logo-1.png"
+import logo from "../assets/logo-1.png"
 const Register = ({ onRegister }) => {
   // sending boolean value to header
   const navigate = useNavigate();

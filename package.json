@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.7.1",
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@jridgewell/sourcemap-codec": "^1.5.0",
     "@rollup/plugin-terser": "^0.4.4",
     "axios": "^1.7.9",
@@ -20,7 +22,7 @@
   "homepage": "https://ahmed-rs-22.github.io/gadget-guru/",
   "scripts": {
     "start": "react-scripts start",
-    "build": "NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",

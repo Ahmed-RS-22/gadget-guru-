@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 const Footer = () => {
   const [subEmail, setSubEmail] = useState("");
   const [subError, setSubError] = useState("");
@@ -7,17 +8,16 @@ const Footer = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-    const sendEamil = async()=>{
-      try{
-        if (isValidEmail(subEmail)) {
-        }
-        else {
-          setSubError("enter a valid Email");
-        }
-      }catch(error){
-        setSubError(error);
+  const sendEamil = async () => {
+    try {
+      if (isValidEmail(subEmail)) {
+      } else {
+        setSubError("enter a valid Email");
       }
-    } 
+    } catch (error) {
+      setSubError(error);
+    }
+  };
 
   return (
     <footer className="footer" id="footer">
@@ -33,7 +33,9 @@ const Footer = () => {
                 placeholder="enter your email"
                 onChange={(e) => setSubEmail(e.target.value)}
               />
-              <button className="sub-btn" onClick={sendEamil}>Subscribe</button>
+              <button className="sub-btn" onClick={sendEamil}>
+                Subscribe
+              </button>
             </div>
           </div>
           <div className="foot-nav">

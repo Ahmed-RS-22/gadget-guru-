@@ -57,7 +57,7 @@
   .home-section{
     min-height: 100dvh;
     width: 100%;
-    background: url(../assets/images/home-layer.png);
+    background: url(../assets/home-layer.png);
     background-size: 80% calc(100% - 20px);
     /* background: radial-gradient(120.54% 152.79% at 103.02% -2.02%, #79B2F3 0%, #4594EF 100%); */
     background-repeat: no-repeat;

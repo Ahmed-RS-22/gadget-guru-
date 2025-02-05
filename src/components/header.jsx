@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import logo from "../assets/images/logo-1.png";
+import logo from "../assets/logo-1.png";
 import "../styles/models.css"; // Assuming your CSS file for styling
 import axios from "axios";
-
+import "@fortawesome/fontawesome-free/css/all.min.css";
 const Header = ({ isUserLogged, onLogout }) => {
   const darkRef = useRef();
   const navigate = useNavigate();

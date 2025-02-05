@@ -270,7 +270,7 @@ header.header .container .user a.register {
   width: 100%;
   min-height: 490px;
   background-color: var(--bg-color);
-  background: url(../assets/images/footer.png);
+  background: url(../assets/footer.png);
   background-size: 100% 65%;
   background-repeat: no-repeat;
   background-position: 0 -10dvh ;

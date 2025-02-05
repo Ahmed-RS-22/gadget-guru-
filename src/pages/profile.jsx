@@ -10,7 +10,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import "../styles/index.css";
+import "../styles/profile.css";
 function Profile() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isPasswordMode, setIsPasswordMode] = useState(false);
