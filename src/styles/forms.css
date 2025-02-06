@@ -23,7 +23,7 @@ body {
 }
 /* main page  */
 .mainform{
-  margin-top: 20dvh;
+  margin: 60px auto;
 }
 .mainform .container {
   width: 100%;

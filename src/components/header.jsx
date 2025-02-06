@@ -38,7 +38,7 @@ const Header = ({ isUserLogged, onLogout }) => {
   };
   useEffect(() => {
     getUserInfo();
-  }, [userInfo]);   
+  }, );   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const handleNavigation = (path, sectionId) => {
     if (location.pathname === path) {
