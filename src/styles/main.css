@@ -419,7 +419,7 @@ font-size: clamp(0.8rem,2dvw,1.2rem);
 }
 .team .container .sec-mission{
 min-height: 450px;
-background-color: #f6f6f6;
+background-color: var(--bg-color);
 position: relative;
 z-index: 1;
 display: flex;
@@ -573,7 +573,7 @@ animation: scroll 25s linear infinite forwards;
 /*contact us  */
 .contact-US{
 min-height: 90dvh;
-background-color: #f6f6f6;
+background-color: var(--bg-color);
 padding: 20px 0px;
 margin-top: 100px;
 }
@@ -667,6 +667,7 @@ flex-direction: column;
 justify-content: center;
 }
 .contact-US .container .sec-2 .form-group .input-holder{
+  background-color: var(--bg-color);
 display: flex;
 flex-direction: column;
 gap: 1dvw;
