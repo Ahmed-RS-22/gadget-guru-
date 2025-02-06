@@ -6,10 +6,47 @@
 }
 
  body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: rgb(249, 250, 251);
-  color: rgb(17, 24, 39);
+  font-family: "Poppins"; 
+}
+:root {
+  --primary-color: #007aff;
+  --primary-color-20: #007aff33;
+  --primary-color--40: #007aff66;
+  --primary-color--60: #007aaa;
+  --light-font-color: #808080;
+  --light-font-color-1: #8e8e93;
+  --light-font-color-2: #d1d1d1;
+  --light-font-color-3: #d0d0d0;
+  --light-font-color-4: #d1d1d6;
+  --icon-color:#5a5d6c;
+  --bg-color: #f5f5f5;
+  --white-color:#fff;
+  --dark-font-color: #1a1a1a;
+  --head-font-color: #111111;
+  --error-color: #ff4d4d;
+  --good-color: #4cd964;
+  --shadow:#0001;
+}
+body.dark {
+  --bg-color: #1a1a1a !important;
+  --dark-font-color: #fafafa !important;
+  --head-font-color: #f5f5f5 !important;
+  --primary-color: #007aff;
+  --primary-color-20: #007aff33;
+  --primary-color--40: #007aff66;
+  --primary-color--60: #007aaa;
+  --light-font-color: #808080;
+  --light-font-color-1: #8e8e93;
+  --light-font-color-2: #d1d1d1;
+  --light-font-color-3: #d0d0d0;
+  --light-font-color-4: #d1d1d6;
+  --icon-color:#5a5d6c;
+  --white-color:#111 !important;
+  --error-color: #ff4d4d;
+  --good-color: #4cd964;
+  --shadow:#fff1;
+  background-color: var(--bg-color);
+
 }
 
 /* Layout */
@@ -27,10 +64,12 @@
 }
 
 .manin-section .container .card {
-  background-color: white;
+  background-color: var(--white-color);
+  border:1px solid var(--dark-font-color);
   border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px var(--shadow);
   overflow: hidden;
+
 }
 
 .header-gradient {
@@ -78,11 +117,12 @@
 .user-name {
   font-size: 1.125rem;
   font-weight: 500;
+  color: var(--dark-font-color);
 }
 
 .user-email {
   font-size: 0.875rem;
-  color: rgb(107, 114, 128);
+  color: var(--light-font-color);
 }
 
 /* Buttons */
@@ -102,7 +142,7 @@
 }
 
 .button-primary {
-  background-color: rgb(59, 130, 246);
+  background-color: var(--primary-color);
   color: white;
 }
 
