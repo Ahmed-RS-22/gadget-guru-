@@ -8,6 +8,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const IcInfo = () => {
   const { Slug } = useParams();
+  console.log(Slug)
   const location = useLocation();
   const [id, setId] = useState(location.state?.id);
   const [isOpen, setIsOpen] = useState(false);
