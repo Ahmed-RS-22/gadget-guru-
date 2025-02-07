@@ -24,9 +24,7 @@ function App() {
       isUserLoggedIn:JSON.parse(localStorage.getItem("userInfo"))?.isUserLoggedIn || false,
     });
     useEffect(() => {
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));
-      console.log("app");
-      
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));      
     },[userInfo]);
   
   const [isUserLogged, setIsUserLogged] = useState(userInfo?.isUserLoggedIn || false);
@@ -47,7 +45,7 @@ useEffect(() => {
   };
   return (
 
-    <Router> 
+    <Router basename="/"> 
       <Header isUserLogged={isUserLogged} onLogout={handleLogout} ></Header>
       <Routes>
         <Route path="" element={<Home />} />
