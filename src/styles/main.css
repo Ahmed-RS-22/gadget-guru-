@@ -401,7 +401,7 @@ min-height: 300px;
 background-color: var(--bg-color);
 width: 80dvw;
 margin: 60px auto 50px ; 
-border: 20px;
+border-radius: 20px;
 
 }
 .team .container .sec-title .title{
