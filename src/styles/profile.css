@@ -174,7 +174,7 @@ body.dark {
 }
 
 .section-title {
-  background-color: var(--dark-font-color);
+ color: var(--dark-font-color);
   font-size: 1.125rem;
   font-weight: 500;
   margin-bottom: 1rem;

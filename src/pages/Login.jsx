@@ -21,41 +21,13 @@ const Login = ({ onLogin }) => {
     setPasswordVisible((prev) => !prev);
   };
 
-  // Validate Password with RegExp
-  const isValidPassword = (password) => {
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return passwordRegex.test(password);
-  };
 
-  // Validate Input Fields
-  const validateInputs = () => {
-    const email = emailRef.current.value;
-    const password = passwordRef.current.value;
 
-    if (!email.includes("@")) {
-      setFeedback({ message: "Please enter a valid email.", success: false });
-      return false;
-    }
-
-    if (!isValidPassword(password)) {
-      setFeedback({
-        message:
-          "Password must be at least 8 characters, include one uppercase, one lowercase, one number, and one special character.",
-        success: false,
-      });
-      return false;
-    }
-
-    setFeedback({ message: "", success: true });
-    return true;
-  };
 
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateInputs()) {
       const payload = {
         email: emailRef.current.value,
         password: passwordRef.current.value,
@@ -97,7 +69,7 @@ setTimeout(()=>{
           success: false,
         });
       }
-    }
+    
   };
     useEffect(() => {
       if (userInfo) {
