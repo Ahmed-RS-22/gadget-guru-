@@ -366,6 +366,8 @@ grid-column: 1/9;
 min-height: 45px;
 font-size: 20px;
 padding: 0 20px;
+background-color: var(--white-color);
+color: var(--dark-font-color);
 }
 .idintify .container .sec-2 .content .search .search-btn{
 padding: 10px 20px;
