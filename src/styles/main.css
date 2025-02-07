@@ -321,7 +321,7 @@ font-weight: 400;
 .idintify .container .sec-2 .content .search{
 position: relative;
 width: 75%;
-background-color: white;
+background-color: var(--white-color);
 border-radius: 16px;
 max-height: 90px;
 display: grid;
