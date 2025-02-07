@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, useParams, useLocation } from "react-router-dom";
 import "../styles/models.css";
-import SliderImages from "../components/slider"
+import SliderImages from "../components/slider";
 import TruthTable from "../components/truthtable";
 import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+
 const IcInfo = () => {
   const { Slug } = useParams();
   const location = useLocation();
@@ -86,7 +87,7 @@ const IcInfo = () => {
           ],
           truth_table: foundIC?.IC_truth_table,
         });
-        setId(foundIC.ID)        
+        setId(foundIC.ID);
       } else {
         setId(0);
       }
@@ -98,7 +99,7 @@ const IcInfo = () => {
   useEffect(() => {
     if (location.state?.id) {
       fetchIcInfo(id);
-    } else {
+    } else if (Slug) { // Ensure Slug exists before calling getAllICs
       getAllICs();
     }
   }, [id, location.state?.id, Slug]);
@@ -109,29 +110,21 @@ const IcInfo = () => {
         "https://gadetguru.mgheit.com/api/ic/saved",
         {
           headers: {
-            Authorization: `Bearer ${
-              JSON.parse(localStorage.getItem("userInfo")).token
-            }`,
+            Authorization: `Bearer ${JSON.parse(localStorage.getItem("userInfo")).token}`,
           },
         }
       );
-      const savedICs = response.data.data;            
-      const currentIC = savedICs
-        .filter((ic) => ic.ID === id)
-        .some((ic) => ic.ID === id);     
-        if (currentIC) {
-          setIsSaved(true);
-        }
-        else{
-          setIsSaved(false);
-        }   
-      } catch (error) {
+      const savedICs = response.data.data;
+      const currentIC = savedICs.some((ic) => ic.ID === id);
+      setIsSaved(currentIC);
+    } catch (error) {
       console.error("Error fetching saved ICs:", error);
     }
   };
+
   useEffect(() => {
     checkSaved();
-  },);
+  }, [id]); // Added dependency to prevent unnecessary API calls
 
   const handleSaving = async () => {
     const formData = new FormData();
@@ -149,7 +142,7 @@ const IcInfo = () => {
     }
   };
 
-  const handleRemoving = async () => {    
+  const handleRemoving = async () => {
     const formData = new FormData();
     formData.append("ic_id", icInfo.Id);
     try {
@@ -161,7 +154,7 @@ const IcInfo = () => {
       });
       setIsSaved(false);
     } catch (error) {
-      console.error("Error saving IC:", error);
+      console.error("Error removing IC:", error);
     }
   };
 
@@ -217,8 +210,7 @@ const IcInfo = () => {
             </div>
             <div className="btns">
               <button className="download" onClick={() => window.open(icInfo.Ic_files, "_blank")}>
-                <i className="fa-solid fa-file-pdf" />
-                Download Datasheet
+                <i className="fa-solid fa-file-pdf" /> Download Datasheet
               </button>
               <button className="video-btn" onClick={openModal}>
                 <i className="fa-brands fa-square-youtube" /> Watch Video
