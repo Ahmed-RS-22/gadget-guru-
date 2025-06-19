@@ -7,7 +7,7 @@ import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const IcInfo = () => {
-  const API = import.meta.env.VITE_BASE_URL;
+const API = process.env.REACT_APP_BASE_URL;
   console.log("API URL:", API);
   
   const { Slug } = useParams();
