@@ -342,6 +342,7 @@ ul {
   top: calc(100% + 1px);
   display: none;
   flex-direction: column;
+  gap: 5px;
   border-radius: 20px;
   z-index: 999;
 }
@@ -350,7 +351,7 @@ ul {
 }
 .idintify .container .sec-2 .content .search .suggetions li {
   min-height: 30px;
-  padding: 10px 20px;
+  padding: 5px 20px;
   transition: 0.2s;
   &:hover {
     background-color: var(--primary-color);

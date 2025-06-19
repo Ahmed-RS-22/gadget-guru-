@@ -55,8 +55,8 @@ const IcInfo = () => {
         Images: [
           selectedIC?.IC_image,
           selectedIC?.IC_blogDiagram,
-          selectedIC.IC_Details[0]?.Chip_image,
-          selectedIC.IC_Details[0]?.Logic_DiagramImage,
+          selectedIC.IC_Details?.Chip_image,
+          selectedIC.IC_Details?.Logic_DiagramImage,
         ],
         truth_table: selectedIC?.IC_truth_table,
       });
@@ -83,8 +83,8 @@ const IcInfo = () => {
           Images: [
             foundIC?.IC_image,
             foundIC?.IC_blogDiagram,
-            foundIC.IC_Details[0]?.Chip_image,
-            foundIC.IC_Details[0]?.Logic_DiagramImage,
+            foundIC.IC_Details?.Chip_image,
+            foundIC.IC_Details?.Logic_DiagramImage,
           ],
           truth_table: foundIC?.IC_truth_table,
         });
