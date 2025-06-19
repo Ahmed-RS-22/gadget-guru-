@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {  Routes, Route, Navigate ,HashRouter} from "react-router-dom";
 import Header from "./components/header";
 import IcInfo from "./pages/ic";
 import Description from "./components/description";
@@ -45,7 +45,7 @@ useEffect(() => {
   };
   return (
 
-    <Router basename="/"> 
+    <HashRouter basename="/"> 
       <Header isUserLogged={isUserLogged} onLogout={handleLogout} ></Header>
       <Routes>
         <Route path="" element={<Home />} />
@@ -71,7 +71,7 @@ useEffect(() => {
         <Route path="*" element={<ErrorPage />} />
       </Routes>
       <Footer></Footer>
-    </Router>
+    </HashRouter>
   );
 }
 
