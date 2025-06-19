@@ -6,7 +6,7 @@ const Params = () => {
   
   // Ensure icInfo is loaded before accessing properties
   
-  const parameter = icInfo.Ic_details[0];
+  const parameter = icInfo.Ic_details;
   
   // State for parameters
   const [parameters, setParameters] = useState({});

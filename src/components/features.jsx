@@ -4,7 +4,7 @@ import { useOutletContext } from "react-router-dom";
 
 const Features = () => {
       const { icInfo } = useOutletContext();
-      const feat = icInfo.Ic_details[0];      
+      const feat = icInfo.Ic_details;      
       // State for parameters
       const [feats, setFeats] = useState([]);
      

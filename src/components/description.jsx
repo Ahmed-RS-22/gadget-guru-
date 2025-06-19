@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 
 const Description = () => {
       const { icInfo } = useOutletContext();
-      const descripton = icInfo.Ic_details[0];      
+      const descripton = icInfo.Ic_details;      
       // State for parameters      
       const [descrip, setDescrip] = useState("");
      

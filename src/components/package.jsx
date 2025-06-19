@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 
 const Package = () => {
   const { icInfo } = useOutletContext();
-  const Pack = icInfo.Ic_details[0];
+  const Pack = icInfo.Ic_details;
 
   // State for parameters
   const [Packages, setPakages] = useState([]);
