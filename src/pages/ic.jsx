@@ -5,267 +5,173 @@ import SliderImages from "../components/slider";
 import TruthTable from "../components/truthtable";
 import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+
 const IcInfo = () => {
   const { Slug } = useParams();
   const location = useLocation();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  // Try to get an initial id from location.state
+  const [id, setId] = useState(location.state?.id || null);
+  const [icInfo, setIcInfo] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [icInfo, setIcInfo] = useState({
-    Id: "",
-    Ic_name: "",
-    Ic_code: "",
-    IC_vendor_name: "",
-    Slug: "",
-    Ic_video: "",
-    Ic_files: "",
-    Images: [],
-    truth_table: [],
-    Ic_details: {},
-  });
   const [isSaved, setIsSaved] = useState(false);
 
-  // Function to open modal with fade-in effect
-  const openModal = () => {
-    setIsOpen(true);
-    setTimeout(() => setIsVisible(true), 10);
-  };
-
-  // Function to close modal with fade-out effect
-  const closeModal = () => {
-    setIsVisible(false);
-    setTimeout(() => setIsOpen(false), 300);
-  };
-
-  const fetchIcInfoById = async (id) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await fetch(`https://gadetguru.mgheit.com/api/ic/show?id=${id}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      const selectedIC = data.data;
-      
-      if (!selectedIC) {
-        throw new Error('IC not found');
-      }
-
-      setIcInfo({
-        Id: selectedIC?.ID || "",
-        Ic_name: selectedIC?.IC_commercial_name || "",
-        Ic_code: selectedIC?.IC_code || "",
-        Ic_details: selectedIC?.IC_Details || {},
-        IC_vendor_name: selectedIC?.IC_vendor_name || "",
-        Slug: selectedIC?.Slug || "",
-        Ic_video: selectedIC?.IC_video || "",
-        Ic_files: selectedIC?.IC_file || "",
-        Images: [
-          selectedIC?.IC_image,
-          selectedIC?.IC_blogDiagram,
-          selectedIC?.IC_Details?.Chip_image,
-          selectedIC?.IC_Details?.Logic_DiagramImage,
-        ].filter(Boolean),
-        truth_table: selectedIC?.IC_truth_table || [],
-      });
-    } catch (error) {
-      console.error("Error fetching IC info by ID:", error);
-      setError("Failed to load IC information");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchIcInfoBySlug = async (slug) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await fetch('https://gadetguru.mgheit.com/api/ic');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      const ICS = data?.data || [];
-      const foundIC = ICS.find((item) => item.Slug === slug);
-      
-      if (!foundIC) {
-        throw new Error('IC not found');
-      }
-
-      setIcInfo({
-        Id: foundIC?.ID || "",
-        Ic_name: foundIC?.IC_commercial_name || "",
-        Ic_code: foundIC?.IC_code || "",
-        Ic_details: foundIC?.IC_Details || {},
-        IC_vendor_name: foundIC?.IC_vendor_name || "",
-        Slug: foundIC?.Slug || "",
-        Ic_video: foundIC?.IC_video || "",
-        Ic_files: foundIC?.IC_file || "",
-        Images: [
-          foundIC?.IC_image,
-          foundIC?.IC_blogDiagram,
-          foundIC?.IC_Details?.Chip_image,
-          foundIC?.IC_Details?.Logic_DiagramImage,
-        ].filter(Boolean),
-        truth_table: foundIC?.IC_truth_table || [],
-      });
-    } catch (error) {
-      console.error("Error fetching IC info by slug:", error);
-      setError("IC not found");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const checkSaved = async (icId) => {
-    try {
-      const userInfo = localStorage.getItem("userInfo");
-      if (!userInfo) return;
-
-      const token = JSON.parse(userInfo).token;
-      const response = await fetch("https://gadetguru.mgheit.com/api/ic/saved", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const savedICs = data.data || [];
-        const currentIC = savedICs.some((ic) => ic.ID === icId);
-        setIsSaved(currentIC);
-      }
-    } catch (error) {
-      console.error("Error fetching saved ICs:", error);
-    }
-  };
-
-  // Main useEffect for data fetching
+  // Fetch logic: by ID if we have one, otherwise by Slug
   useEffect(() => {
-    const locationId = location.state?.id;
-    
-    if (locationId) {
-      // Priority 1: Use ID from location state (navigation from another page)
-      fetchIcInfoById(locationId);
-    } else if (Slug) {
-      // Priority 2: Use slug from URL params (direct URL access or refresh)
-      fetchIcInfoBySlug(Slug);
-    } else {
-      // No valid identifier found
-      setError("No IC identifier provided");
-      setIsLoading(false);
-    }
-  }, [Slug, location.state?.id]);
+    let cancelled = false;
 
-  // Check if IC is saved when icInfo.Id changes
+    const loadIc = async () => {
+      try {
+        let data;
+        if (id) {
+          // 1) fetch by numeric ID
+          const res = await axios.get(
+            `https://gadetguru.mgheit.com/api/ic/show?id=${id}`
+          );
+          data = res.data.data;
+        } else {
+          // 2) fallback: fetch all ICs, find by Slug
+          const resAll = await axios.get(
+            "https://gadetguru.mgheit.com/api/ic"
+          );
+          const found = resAll.data.data.find((item) => item.Slug === Slug);
+
+          if (!found) {
+            // nothing matched
+            data = null;
+          } else {
+            data = found;
+            // save the newly discovered ID so future reloads get it
+            window.history.replaceState({ id: found.ID }, "");
+            setId(found.ID);
+          }
+        }
+
+        if (!cancelled) {
+          if (data) {
+            setIcInfo({
+              Id: data.ID,
+              Ic_name: data.IC_commercial_name,
+              Ic_code: data.IC_code,
+              IC_vendor_name: data.IC_vendor_name,
+              Slug: data.Slug,
+              Ic_video: data.IC_video,
+              Ic_files: data.IC_file,
+              Images: [
+                data.IC_image,
+                data.IC_blogDiagram,
+                data.IC_Details?.Chip_image,
+                data.IC_Details?.Logic_DiagramImage,
+              ],
+              truth_table: data.IC_truth_table,
+              Ic_details: data.IC_Details,
+            });
+          } else {
+            setIcInfo({ notFound: true });
+          }
+        }
+      } catch (err) {
+        console.error("Error loading IC:", err);
+      }
+    };
+
+    loadIc();
+    return () => {
+      cancelled = true;
+    };
+  }, [Slug]);
+
+  // Check saved state once we have a valid id
   useEffect(() => {
-    if (icInfo.Id) {
-      checkSaved(icInfo.Id);
-    }
-  }, [icInfo.Id]);
+    if (!id) return;
+
+    const checkSaved = async () => {
+      try {
+        const token = JSON.parse(localStorage.getItem("userInfo")).token;
+        const res = await axios.get(
+          "https://gadetguru.mgheit.com/api/ic/saved",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setIsSaved(res.data.data.some((ic) => ic.ID === id));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    checkSaved();
+  }, [id]);
 
   const handleSaving = async () => {
     try {
-      const userInfo = localStorage.getItem("userInfo");
-      if (!userInfo) return;
-
-      const token = JSON.parse(userInfo).token;
-      const formData = new FormData();
-      formData.append("ic_id", icInfo.Id);
-
-      const response = await fetch("https://gadetguru.mgheit.com/api/ic/save", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        setIsSaved(true);
-      }
-    } catch (error) {
-      console.error("Error saving IC:", error);
+      const token = JSON.parse(localStorage.getItem("userInfo")).token;
+      const fd = new FormData();
+      fd.append("ic_id", icInfo.Id);
+      await axios.post(
+        "https://gadetguru.mgheit.com/api/ic/save",
+        fd,
+        { headers: { Accept: "application/json", Authorization: `Bearer ${token}` } }
+      );
+      setIsSaved(true);
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const handleRemoving = async () => {
     try {
-      const userInfo = localStorage.getItem("userInfo");
-      if (!userInfo) return;
-
-      const token = JSON.parse(userInfo).token;
-      const formData = new FormData();
-      formData.append("ic_id", icInfo.Id);
-
-      const response = await fetch("https://gadetguru.mgheit.com/api/ic/remove", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        setIsSaved(false);
-      }
-    } catch (error) {
-      console.error("Error removing IC:", error);
+      const token = JSON.parse(localStorage.getItem("userInfo")).token;
+      const fd = new FormData();
+      fd.append("ic_id", icInfo.Id);
+      await axios.post(
+        "https://gadetguru.mgheit.com/api/ic/remove",
+        fd,
+        { headers: { Accept: "application/json", Authorization: `Bearer ${token}` } }
+      );
+      setIsSaved(false);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const handleVideoClick = () => {
-    if (icInfo.Ic_video) {
-      openModal();
-    }
+  // Modal fade-in / fade-out
+  const openModal = () => {
+    setIsOpen(true);
+    setTimeout(() => setIsVisible(true), 10);
+  };
+  const closeModal = () => {
+    setIsVisible(false);
+    setTimeout(() => setIsOpen(false), 200);
   };
 
-  const handleDownloadClick = () => {
-    if (icInfo.Ic_files) {
-      window.open(icInfo.Ic_files, "_blank");
-    }
-  };
-
-  if (isLoading) {
+  // Render guards
+  if (!icInfo) {
     return (
       <section className="ic-info" id="icInfo">
         <div className="container">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading IC information...</p>
-          </div>
+          <p>Loading...</p>
         </div>
       </section>
     );
   }
 
-  if (error) {
+  if (icInfo.notFound) {
     return (
       <section className="ic-info" id="icInfo">
         <div className="container">
-          <div className="error-container">
-            <h2>IC Not Found</h2>
-            <p>{error}</p>
-          </div>
+          <h2>IC Not Found</h2>
         </div>
       </section>
     );
   }
 
+  // Main render
   return (
-      <section className="ic-info" id="icInfo">
+    <section className="ic-info" id="icInfo">
       <div className="container">
         <div className="row up">
           <aside className="box left">
-            <SliderImages images={icInfo.Images.map((img) => img)} />
+            <SliderImages images={icInfo.Images} />
           </aside>
           <aside className="box right">
             <div className="ic-names">
@@ -273,7 +179,10 @@ const IcInfo = () => {
                 <h2>{icInfo.Ic_code}</h2>
                 <p>{icInfo.Ic_name}</p>
               </div>
-              <button className="save" onClick={isSaved ? handleRemoving : handleSaving}>
+              <button
+                className="save"
+                onClick={isSaved ? handleRemoving : handleSaving}
+              >
                 <i className={`fa-${isSaved ? "solid" : "regular"} fa-bookmark`} />
               </button>
             </div>
@@ -301,7 +210,10 @@ const IcInfo = () => {
               </div>
             </div>
             <div className="btns">
-              <button className="download" onClick={() => window.open(icInfo.Ic_files, "_blank")}>
+              <button
+                className="download"
+                onClick={() => window.open(icInfo.Ic_files, "_blank")}
+              >
                 <i className="fa-solid fa-file-pdf" /> Download Datasheet
               </button>
               <button className="video-btn" onClick={openModal}>
