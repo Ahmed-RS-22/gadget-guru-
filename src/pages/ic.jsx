@@ -7,6 +7,9 @@ import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const IcInfo = () => {
+  const API = import.meta.env.VITE_BASE_URL;
+  console.log("API URL:", API);
+  
   const { Slug } = useParams();
   const location = useLocation();
 
@@ -27,13 +30,13 @@ const IcInfo = () => {
         if (id) {
           // 1) fetch by numeric ID
           const res = await axios.get(
-            `https://gadetguru.mgheit.com/api/ic/show?id=${id}`
+            `${API}/api/ic/show?id=${id}`
           );
           data = res.data.data;
         } else {
           // 2) fallback: fetch all ICs, find by Slug
           const resAll = await axios.get(
-            "https://gadetguru.mgheit.com/api/ic"
+            `${API}/api/ic`
           );
           const found = resAll.data.data.find((item) => item.Slug === Slug);
 
@@ -90,7 +93,7 @@ const IcInfo = () => {
       try {
         const token = JSON.parse(localStorage.getItem("userInfo")).token;
         const res = await axios.get(
-          "https://gadetguru.mgheit.com/api/ic/saved",
+            `${API}/api/ic/saved`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setIsSaved(res.data.data.some((ic) => ic.ID === id));
