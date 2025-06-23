@@ -15,6 +15,7 @@ import Profile from "./pages/profile";
 import ForgetPassword from "./pages/forget-password";
 import OTPVerification from "./pages/otp-verfication";
 import ResetPassword from "./pages/reset-password";
+import Logic from "./pages/logic";
 import Home from "./pages/main";
 import TermsAndConditions from "./pages/terms-conditions";
 function App() {
@@ -54,6 +55,7 @@ useEffect(() => {
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/saved" element={<Saved />} />
+        <Route path="/logic" element={<Logic />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
         <Route path="/otp-verification" element={<OTPVerification />} />
         <Route path="/reset-password" element={<ResetPassword />} />

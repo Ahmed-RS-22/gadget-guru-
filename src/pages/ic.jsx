@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, useParams, useLocation } from "react-router-dom";
 import "../styles/models.css";
 import SliderImages from "../components/slider";
-import TruthTable from "../components/truthtable";
+import IcTruthTable from "../components/Ictruthtable";
 import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
@@ -243,7 +243,7 @@ const API = process.env.REACT_APP_BASE_URL;
           </aside>
         </div>
         <div className="row down">
-          <TruthTable data={icInfo.truth_table} />
+          <IcTruthTable data={icInfo.truth_table} />
         </div>
       </div>
     </section>

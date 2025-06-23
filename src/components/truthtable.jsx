@@ -1,62 +1,68 @@
-import { useEffect, useState } from "react";
+import React from 'react';
+import { useCircuit } from '../context/CircuitContext';
+import { FileText } from 'lucide-react';
+import { getBinary } from '../utils/booleanLogic';
 
-const TruthTable = ({ data }) => {
-  const [length, setLength] = useState(0);
-  const [ttData, setTTData] = useState([]);
-  useEffect(() => {
-    setLength(data.length);
-    setTTData(data);
-  }, [data, ttData]);
-  if (length === 8) {
-    return (
-      <div className="truth-table">
-        <div className="t-row head">
-          <span className="cell in">A</span>
-          <span className="cell in">B</span>
-          <span className="cell in">C</span>
-          <span className="cell in">D</span>
-          <span className="cell out">Output </span>
-        </div>
+const TruthTable = () => {
+  const { numInputs, outputs, toggleOutput } = useCircuit();
+  
+  // Generate variable names based on number of inputs
+  const variableNames = ['A', 'B', 'C', 'D'].slice(0, numInputs);
+  
+  // Generate all possible input combinations
+  const totalCombinations = Math.pow(2, numInputs);
+  const combinations = Array.from({ length: totalCombinations }, (_, i) => i);
 
-        {ttData.map((item, index) => {
-          return (
-            <div className="t-row " key={index}>
-              <span className="cell in">{item.Input[0]}</span>
-              <span className="cell in">{item.Input[1]}</span>
-              <span className="cell in">{item.Input[2]}</span>
-              <span className="cell in">{item.Input[3]}</span>
-              <span className="cell out">{item.Output} </span>
-            </div>
-          );
-        })}
+  return (
+    <div className="card">
+      <div className="card-header">
+        <FileText className="card-icon" />
+        <h2 className="card-title">Truth Table</h2>
       </div>
-    );
-  } else if (length === 4) {
-    return (
-      <div className="truth-table">
-        <div className="t-row head">
-          <span className="cell in">A</span>
-          <span className="cell in">B</span>
-          <span className="cell out">Output </span>
-        </div>
-
-        {ttData.map((item, index) => {
-          return (
-            <div className="t-row " key={index}>
-              <span className="cell in">{item.Input[0]}</span>
-              <span className="cell in">{item.Input[1]}</span>
-              <span className="cell out">{item.Output} </span>
-            </div>
-          );
-        })}
+      
+      <div className="truth-table-container">
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th className="index-cell">Index</th>
+              {variableNames.map((name, idx) => (
+                <th key={idx}>{name}</th>
+              ))}
+              <th>Output</th>
+            </tr>
+          </thead>
+          <tbody>
+            {combinations.map((idx) => {
+              const binary = getBinary(idx, numInputs);
+              return (
+                <tr key={idx}>
+                  <td className="index-cell">{idx}</td>
+                  {binary.split('').map((bit, bitIdx) => (
+                    <td key={bitIdx}>{bit}</td>
+                  ))}
+                  <td>
+                    <div 
+                      className={`output-toggle ${outputs[idx] ? 'active' : 'inactive'}`}
+                      onClick={() => toggleOutput(idx)}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggleOutput(idx);
+                        }
+                      }}
+                    >
+                      {outputs[idx] ? '1' : '0'}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-    );
-  } else {
-    return (
-      <div className="truth-table">
-        <h2>there is no truth table </h2>
-      </div>
-    );
-  }
+    </div>
+  );
 };
+
 export default TruthTable;

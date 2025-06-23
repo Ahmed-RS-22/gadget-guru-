@@ -320,7 +320,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                       <div className="icon-2">
                         <i class="fa-solid fa-gear"></i>
                       </div>
-                      <Link className="uc-link" to="/settings">
+                      <Link className="uc-link" to="/logic">
                         settings
                       </Link>
                     </li>
