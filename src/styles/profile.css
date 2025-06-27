@@ -80,6 +80,12 @@ body.dark {
 .card-body {
   padding: 1.5rem 2rem;
 }
+@media (width <= 640px) {
+.card-body {
+  padding: 0rem 0rem;
+}
+  
+}
 
 /* Profile Header */
 .profile-header {

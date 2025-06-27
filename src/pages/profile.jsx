@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import MapPicker from "../components/map";
 import {
   User,
   Mail,
@@ -11,6 +12,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import "../styles/profile.css";
+
 function Profile() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isPasswordMode, setIsPasswordMode] = useState(false);
@@ -20,6 +22,7 @@ function Profile() {
     new: false,
     confirm: false,
   });
+
   const [profile, setProfile] = useState({
     first_name: "",
     last_name: "",
@@ -27,14 +30,17 @@ function Profile() {
     phone: "+20",
     country: "Egypt",
     language: "English",
+
   });
+
   const [userInfo, setUserInfo] = useState({
     token: JSON.parse(localStorage.getItem("userInfo"))?.token,
     isUserLoggedIn: JSON.parse(localStorage.getItem("userInfo"))
       ?.isUserLoggedIn,
   });
+
   const getUserInfo = async () => {
-    if (JSON.parse(localStorage.getItem("userInfo")).isUserLoggedIn) {
+    if (userInfo.isUserLoggedIn) {
       try {
         const response = await axios.get(
           "https://gadetguru.mgheit.com/api/profile",
@@ -46,19 +52,23 @@ function Profile() {
           }
         );
         const result = response.data.data;
+
         setProfile({
           ...result,
           country: "Egypt",
           language: "English",
+          latitude: result.latitude,
+          longitude: result.longitude,
         });
       } catch (error) {
         console.log(error);
       }
     }
   };
+
   useEffect(() => {
     getUserInfo();
-  }, []);
+  }, [userInfo.isUserLoggedIn, userInfo.token]);
 
   const [passwords, setPasswords] = useState({
     current: "",
@@ -73,15 +83,15 @@ function Profile() {
   const saveProfileChanges = async () => {
     const form = new FormData();
     const payLoad = {
-      // ...profile,
       first_name: profile.first_name,
       last_name: profile.last_name,
       username: profile.first_name + " " + profile.last_name,
+      phone: profile.phone,
+      latitude: profile.latitude,
+      longitude: profile.longitude,
     };
 
     Object.keys(payLoad).forEach((key) => {
-      console.log(key, payLoad[key]);
-
       form.append(key, payLoad[key]);
     });
 
@@ -107,11 +117,13 @@ function Profile() {
   const handleSaveChanges = () => {
     saveProfileChanges();
   };
+
   const isValidPassword = (password) => {
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return passwordRegex.test(password);
   };
+
   const validate = () => {
     if (!isValidPassword(passwords.new)) {
       setError(
@@ -127,14 +139,10 @@ function Profile() {
       setError("Passwords do not match");
       return false;
     }
-    if (
-      passwords.new !== passwords.current &&
-      passwords.new === passwords.confirm
-    ) {
-      setError("");
-      return true;
-    }
+    setError("");
+    return true;
   };
+
   const handlePasswordChange = async () => {
     if (validate()) {
       const formData = new FormData();
@@ -151,7 +159,6 @@ function Profile() {
             },
           }
         );
-        console.log(response.data);
         setIsPasswordMode(false);
       } catch (error) {
         console.error(error);
@@ -174,7 +181,7 @@ function Profile() {
                     </div>
                     <div className="user-details">
                       <h2 className="user-name">
-                        {profile.first_name + "" + profile.last_name}
+                        {profile.first_name + " " + profile.last_name}
                       </h2>
                       <p className="user-email">{profile.email}</p>
                     </div>
@@ -197,75 +204,37 @@ function Profile() {
                 <div className="form-section">
                   <h3 className="section-title">Change Password</h3>{" "}
                   <span style={{ color: "#e34152" }}>{error}</span>
-                  <div className="form-group">
-                    <label className="form-label">Current Password</label>
-                    <div className="input-wrapper">
-                      <input
-                        type={showPassword.current ? "text" : "password"}
-                        className="form-input password-input"
-                        onChange={(e) =>
-                          setPasswords((prev) => ({
-                            ...prev,
-                            current: e.target.value,
-                          }))
-                        }
-                      />
-                      <Lock className="input-icon" />
-                      <button
-                        type="button"
-                        onClick={() => handlePasswordVisibility("current")}
-                        className="password-toggle"
-                      >
-                        {showPassword.current ? <EyeOff /> : <Eye />}
-                      </button>
+                  {["current", "new", "confirm"].map((field) => (
+                    <div className="form-group" key={field}>
+                      <label className="form-label">
+                        {field === "confirm"
+                          ? "Confirm New Password"
+                          : field === "new"
+                          ? "New Password"
+                          : "Current Password"}
+                      </label>
+                      <div className="input-wrapper">
+                        <input
+                          type={showPassword[field] ? "text" : "password"}
+                          className="form-input password-input"
+                          onChange={(e) =>
+                            setPasswords((prev) => ({
+                              ...prev,
+                              [field]: e.target.value,
+                            }))
+                          }
+                        />
+                        <Lock className="input-icon" />
+                        <button
+                          type="button"
+                          onClick={() => handlePasswordVisibility(field)}
+                          className="password-toggle"
+                        >
+                          {showPassword[field] ? <EyeOff /> : <Eye />}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">New Password</label>
-                    <div className="input-wrapper">
-                      <input
-                        type={showPassword.new ? "text" : "password"}
-                        className="form-input password-input"
-                        onChange={(e) =>
-                          setPasswords((prev) => ({
-                            ...prev,
-                            new: e.target.value,
-                          }))
-                        }
-                      />
-                      <Lock className="input-icon" />
-                      <button
-                        type="button"
-                        onClick={() => handlePasswordVisibility("new")}
-                        className="password-toggle"
-                      >
-                        {showPassword.new ? <EyeOff /> : <Eye />}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Confirm New Password</label>
-                    <div className="input-wrapper">
-                      <input
-                        type={showPassword.confirm ? "text" : "password"}
-                        className="form-input password-input"
-                        onChange={(e) =>
-                          setPasswords((prev) => ({
-                            ...prev,
-                            confirm: e.target.value,
-                          }))
-                        }
-                      />
-                      <Lock className="input-icon" />
-                      <button
-                        type="button"
-                        onClick={() => handlePasswordVisibility("confirm")}
-                        className="password-toggle"
-                      >
-                        {showPassword.confirm ? <EyeOff /> : <Eye />}
-                      </button>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -328,6 +297,7 @@ function Profile() {
                   )}
                 </div>
               </div>
+
               <div className="form-section">
                 <h3 className="section-title">Full Name</h3>
                 <div className="form-grid">
@@ -341,7 +311,7 @@ function Profile() {
                       onChange={(e) =>
                         setProfile((prev) => ({
                           ...prev,
-                          first_name: `${e.target.value}`,
+                          first_name: e.target.value,
                         }))
                       }
                     />
@@ -356,13 +326,14 @@ function Profile() {
                       onChange={(e) =>
                         setProfile((prev) => ({
                           ...prev,
-                          last_name: `${e.target.value}`,
+                          last_name: e.target.value,
                         }))
                       }
                     />
                   </div>
                 </div>
               </div>
+
               <div className="form-section">
                 <h3 className="section-title">Contact Information</h3>
                 <p className="section-description">
@@ -407,6 +378,7 @@ function Profile() {
                   </div>
                 </div>
               </div>
+
               <div className="form-section">
                 <h3 className="section-title">Regional Settings</h3>
                 <div className="form-grid">
@@ -431,6 +403,7 @@ function Profile() {
                       <Globe2 className="input-icon" />
                     </div>
                   </div>
+
                   <div className="form-group">
                     <label className="form-label">Language</label>
                     <div className="input-wrapper">
@@ -451,6 +424,23 @@ function Profile() {
                       </select>
                       <Languages className="input-icon" />
                     </div>
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: "1 / -1" }}>
+                    <label className="form-label">Location</label>
+                    <MapPicker
+                      lat={profile.latitude}
+                      lng={profile.longitude}
+                      token={userInfo.token}
+                      isEditMode={isEditMode}
+                      setLatLng={({ lat, lng }) =>
+                        setProfile((prev) => ({
+                          ...prev,
+                          latitude: lat,
+                          longitude: lng,
+                        }))
+                      }
+                    />
                   </div>
                 </div>
               </div>
