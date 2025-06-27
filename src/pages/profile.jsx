@@ -30,7 +30,6 @@ function Profile() {
     phone: "+20",
     country: "Egypt",
     language: "English",
-
   });
 
   const [userInfo, setUserInfo] = useState({
@@ -57,8 +56,6 @@ function Profile() {
           ...result,
           country: "Egypt",
           language: "English",
-          latitude: result.latitude,
-          longitude: result.longitude,
         });
       } catch (error) {
         console.log(error);
@@ -68,8 +65,7 @@ function Profile() {
 
   useEffect(() => {
     getUserInfo();
-  }, [userInfo.isUserLoggedIn, userInfo.token]);
-
+  }, []);
   const [passwords, setPasswords] = useState({
     current: "",
     new: "",
@@ -440,6 +436,13 @@ function Profile() {
                           longitude: lng,
                         }))
                       }
+                         onChange={(e) =>
+                          setProfile((prev) => ({
+                            ...prev,
+                            latitude: e.target.value,
+                            longitude: e.target.value,
+                          }))
+                        } 
                     />
                   </div>
                 </div>
