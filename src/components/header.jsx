@@ -308,7 +308,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                     </li>
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-regular fa-bookmark"></i>
+                        <i class="fa-solid fa-bookmark"></i>
                       </div>
                       <Link className="uc-link" to="/saved">
                         saved ICs
@@ -316,15 +316,15 @@ const Header = ({ isUserLogged, onLogout }) => {
                     </li>
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-solid fa-gear"></i>
+                        <Cpu size={24}/>
                       </div>
                       <Link className="uc-link" to="/logic">
-                        settings
+                        Karnough map 
                       </Link>
                     </li>
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-regular fa-circle-question"></i>
+                        <i class="fa-solid fa-circle-question"></i>
                       </div>
                       <Link className="uc-link" to="/tersms-and-conditions">
                         help center{" "}
@@ -336,11 +336,11 @@ const Header = ({ isUserLogged, onLogout }) => {
                       <div className="icon-2">
                         <i
                           class={`${
-                            isDark ? "fa-solid fa-moon" : "fa-regular fa-sun "
+                            isDark ? "fa-solid fa-moon" : "fa-solid fa-sun "
                           }`}
                         ></i>
                       </div>
-                      dark mode
+                       &nbsp;  dark mode
                     </div>
                     <label className="switch">
                       <input

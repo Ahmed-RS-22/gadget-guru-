@@ -667,6 +667,14 @@ ul {
   color: white;
   font-weight: bold;
   font-size: 16px;
+  transition: transform 0.3s, background-color 0.3s;
+  &:hover {
+    background-color: var(--primary-color--60);
+    transform: scale(1.02);
+  }
+  &:active {
+    transform: scale(0.9);
+  }
 }
 .contact-US .container .sec-2 .form-group {
   display: grid;
