@@ -1,7 +1,8 @@
-import React, { useRef, useState ,useEffect} from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "../styles/forms.css";
-import { useNavigate,Link } from "react-router-dom";
-import logo from "../assets/logo-1.png"
+import { useNavigate, Link } from "react-router-dom";
+import logo from "../assets/logo-1.png";
+import axios from "axios";
 const Login = ({ onLogin }) => {
   // Refs for form inputs
   const emailRef = useRef();
@@ -9,10 +10,11 @@ const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   // Feedback state
   const [feedback, setFeedback] = useState({ message: "", success: false });
-    const [userInfo, setUserInfo] = useState({
-      token: JSON.parse(localStorage.getItem("userInfo"))?.token || "",
-      isUserLoggedIn: JSON.parse(localStorage.getItem("userInfo"))?.isUserLoggedIn || false,
-    });    
+  const [userInfo, setUserInfo] = useState({
+    token: JSON.parse(localStorage.getItem("userInfo"))?.token || "",
+    isUserLoggedIn:
+      JSON.parse(localStorage.getItem("userInfo"))?.isUserLoggedIn || false,
+  });
   // Password Visibility State
   const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -21,61 +23,62 @@ const Login = ({ onLogin }) => {
     setPasswordVisible((prev) => !prev);
   };
 
-
-
-
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-      const payload = {
-        email: emailRef.current.value,
-        password: passwordRef.current.value,
-      };
+    const payload = {
+      email: emailRef.current.value,
+      password: passwordRef.current.value,
+    };
 
-      try {
-        // API Call (example endpoint)
-        const response = await fetch("https://gadetguru.mgheit.com/api/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
+    try {
+      // API Call (example endpoint)
+      const response = await fetch("https://gadetguru.mgheit.com/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-        if (!response.ok) {
-          throw new Error("Login failed.");
-        }
-
-        const result = await response.json();
-        const user = result.data;        
-        //  save the user token to local storage
-        console.log(user);
-        
-        onLogin();
-        setUserInfo({
-          token: user.token,
-          isUserLoggedIn: true,
-        });        
-setTimeout(()=>{
-          navigate("/home",{state:{user}});
-        },3000)
-        setFeedback({ message: "Login successful!", success: true });
-      } catch (error) {
-        console.error("Error:", error);
-        setFeedback({
-          message: "Invalid email or password. Please try again.",
-          success: false,
-        });
+      if (!response.ok) {
+        throw new Error("Login failed.");
       }
-    
+
+      const result = await response.json();
+      const user = result.data;
+      //  save the user token to local storage
+      console.log(user);
+
+      onLogin();
+      setUserInfo({
+        token: user.token,
+        isUserLoggedIn: true,
+      });
+      setTimeout(() => {
+        navigate("/home", { state: { user } });
+      }, 3000);
+      setFeedback({ message: "Login successful!", success: true });
+    } catch (error) {
+      console.error("Error:", error);
+      setFeedback({
+        message: "Invalid email or password. Please try again.",
+        success: false,
+      });
+    }
   };
-    useEffect(() => {
-      if (userInfo) {
-        localStorage.setItem("userInfo", JSON.stringify(userInfo));        
-      }
-    }, [userInfo]);
+  // login usinig social media
+  const handleSocialLogin = async (provider) => {
+    window.location.href = `https://gadetguru.mgheit.com/api/${provider}/login`;
+  };
+
+  useEffect(() => {
+    if (userInfo) {
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+    }
+  }, [userInfo]);
 
   return (
     <main className="mainform">
@@ -138,14 +141,17 @@ setTimeout(()=>{
 
             {/* Terms and Policy */}
             <p className="message">
-              By signing in, you agree to the <Link className="span" to="/tersms-and-conditions">Terms of use</Link> and{" "}
-              <span className="span">Privacy Policy.</span>
+              By signing in, you agree to the{" "}
+              <Link className="span" to="/tersms-and-conditions">
+                Terms of use
+              </Link>{" "}
+              and <span className="span">Privacy Policy.</span>
             </p>
           </div>
 
           {/* Other Issues */}
           <div className="problems">
-            <a >Other issue with sign in</a>
+            <a>Other issue with sign in</a>
             <Link to="/forget-password">Forget your password</Link>
           </div>
 
@@ -154,6 +160,15 @@ setTimeout(()=>{
             <fieldset>
               <legend>New to our community</legend>
               <Link to="/register">Create an account</Link>
+              <button
+                className="google-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSocialLogin("google");
+                }}
+              >
+                <i className="fa-brands fa-google"></i> Sign in with Google
+              </button>
             </fieldset>
           </div>
         </form>

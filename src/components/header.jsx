@@ -316,6 +316,14 @@ const Header = ({ isUserLogged, onLogout }) => {
                     </li>
                     <li className="item">
                       <div className="icon-2">
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <Link className="uc-link" to="/popular">
+                        Popular ICs
+                      </Link>
+                    </li>
+                    <li className="item">
+                      <div className="icon-2">
                         <Cpu size={24}/>
                       </div>
                       <Link className="uc-link" to="/logic">

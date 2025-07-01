@@ -7,9 +7,11 @@ import Features from "./components/features";
 import Params from "./components/parameters";
 import Package from "./components/package";
 import Saved from "./pages/saved";
+import Popular from "./pages/popular";
 import ErrorPage from "./pages/error";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import SocialCallback from "./pages/SocialCallback";
 import Footer from "./components/footer";
 import Profile from "./pages/profile";
 import ForgetPassword from "./pages/forget-password";
@@ -53,8 +55,11 @@ useEffect(() => {
         <Route path="/home" element={<Home />} />
         <Route path="/register" element={<Register onRegister={handleLogin} />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/social-callback" element={<SocialCallback onLogin={handleLogin} />} />
+
         <Route path="/profile" element={<Profile />} />
         <Route path="/saved" element={<Saved />} />
+        <Route path="/popular" element={<Popular />} />
         <Route path="/logic" element={<Logic />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
         <Route path="/otp-verification" element={<OTPVerification />} />

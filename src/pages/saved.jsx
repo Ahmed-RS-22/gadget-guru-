@@ -1,107 +1,141 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import "../styles/models.css"
+import "../styles/models.css";
+
 const Saved = () => {
   const [components, setComponents] = useState([]);
+  const [filteredComponents, setFilteredComponents] = useState([]);
   const [search, setSearch] = useState("");
   const [error, setError] = useState(null);
-  // Function to get token from localStorage
-    const getAuthToken = () => JSON.parse(localStorage.getItem("userInfo")).token;    
-  //   // Fetch saved components from API
-    useEffect(() => {
-      const fetchComponents = async () => {
-        const token = getAuthToken();        
-        if (!token) {
-          setError("Authentication token is missing.");
-          return;
-        }
+  const [noDataMessage, setNoDataMessage] = useState("");
 
-        try {
-          const response = await axios.get("https://gadetguru.mgheit.com/api/ic/saved", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: "application/json",
-            },
-          });
-          const Ics =response.data.data 
-          if(Ics.length > 0){
-            setComponents(Ics);
-          }else{
-            setComponents(["there is no sved ICS"])
-          }
-        } catch (err) {
-          setError("Failed to fetch components. Please try again later.");
-          console.error("Error fetching components:", err);
-        }
-      };
-      fetchComponents();
-    }, []);
+  const getAuthToken = () => {
+    const userInfo = localStorage.getItem("userInfo");
+    return userInfo ? JSON.parse(userInfo).token : null;
+  };
 
-  //   // Function to remove a component
-    const removeComponent = async (ic_id) => {      
-      const token = getAuthToken();      
-      if (!token) {
-        setError("Authentication token is missing.");
-        return;
-      }
-      const formData = new FormData();
-      formData.append("ic_id", ic_id);
+  const fetchComponents = async () => {
+    const token = getAuthToken();
+    if (!token) {
+      setError("Authentication token is missing.");
+      return;
+    }
 
-      try {
-        await axios.post("https://gadetguru.mgheit.com/api/ic/remove",
-          formData,
-         {
+    try {
+      const response = await axios.get(
+        "https://gadetguru.mgheit.com/api/ic/saved",
+        {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
- // Send ic_id in request body
-        });        
-        setComponents((prev) => prev.filter((component) => component.ID !== ic_id)); // Update state
-      } catch (err) {
-        setError("Failed to remove the component. Please try again.");
-        console.error("Error deleting component:", err);
+        }
+      );
+
+      const ics = response.data.data;
+      if (ics.length > 0) {
+        setComponents(ics);
+        setFilteredComponents(ics);
+        setNoDataMessage("");
+      } else {
+        setComponents([]);
+        setFilteredComponents([]);
+        setNoDataMessage("There are no saved ICs.");
       }
-    };    
-  // Filter components based on search
+    } catch (err) {
+      setError("Failed to fetch components. Please try again later.");
+      console.error("Error fetching components:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchComponents();
+  }, []);
+
+  const handleSearch = (searchTerm) => {
+    setSearch(searchTerm);
+
+    if (searchTerm.trim() === "") {
+      setFilteredComponents(components);
+      return;
+    }
+
+    const filtered = components.filter(
+      (component) =>
+        component.IC_commercial_name.toLowerCase().includes(
+          searchTerm.toLowerCase()
+        ) || component.IC_code.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    setFilteredComponents(filtered);
+  };
+
+  const removeComponent = async (ic_id) => {
+    const token = getAuthToken();
+    if (!token) {
+      setError("Authentication token is missing.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("ic_id", ic_id);
+
+    try {
+      await axios.post("https://gadetguru.mgheit.com/api/ic/remove", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      const updated = components.filter((component) => component.ID !== ic_id);
+      setComponents(updated);
+      setFilteredComponents(updated);
+
+      if (updated.length === 0) {
+        setNoDataMessage("There are no saved ICs.");
+      }
+    } catch (err) {
+      setError("Failed to remove the component. Please try again.");
+      console.error("Error deleting component:", err);
+    }
+  };
+
   return (
     <div className="saved">
       <div className="container">
         <div className="head">
           <h2 className="text">saved componenets</h2>
-          <input 
-          type="text" 
-          className="search-box" 
-          placeholder="search" />
+          <input
+            onChange={(e) => handleSearch(e.target.value)}
+            type="text"
+            className="search-box"
+            placeholder="search"
+            value={search}
+          />
         </div>
+
         <div className="items">
-            {components.map((component,index) => {
-                  if(typeof component == "string"){
-                        return (
-                              <>
-                              <h2>
-                                    {component}
-                              </h2>
-                              </>
-                        )
-                  }
-                  return (
-                        <div className="item" key={index}>
-                        <div className="image">
-                              <img src={component.IC_image} alt="" />
-                        </div>
-                        <div className="text">
-                              <h3>{component.IC_commercial_name} </h3>
-                              <p>{component.IC_code}</p>
-                        </div>
-                        <button className="save-btn" onClick={()=>removeComponent(component.ID)}>
-                        <i
-                        class={`fa-solid fa-bookmark`}
-                      ></i>
-                        </button>
-                  </div>
-                  )
-            })}
+          {error && <h2>{error}</h2>}
+          {noDataMessage && <h2>{noDataMessage}</h2>}
+
+          {filteredComponents.map((component) => (
+            <div className="item" key={component.ID}>
+              <div className="image">
+                <img src={component.IC_image} alt="" />
+              </div>
+              <div className="text">
+                <h3>{component.IC_commercial_name}</h3>
+                <p>{component.IC_code}</p>
+              </div>
+              <button
+                className="save-btn"
+                onClick={() => removeComponent(component.ID)}
+              >
+                <i className="fa-solid fa-bookmark"></i>
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
