@@ -5,6 +5,7 @@
   box-sizing: border-box;
   border: none;
   outline: none;
+      transition: color 0.3s ease;
 }
 :root {
   --primary-color: #007aff;
@@ -458,7 +459,7 @@ ul {
 
 @media (min-width: 1024px) {
   .team .container .sec-team .team-members .scrolling .card {
-    --color: #111;
+    --color: var(--dark-font-color);
     width: 300px;
     position: relative;
     display: flex;
@@ -466,6 +467,7 @@ ul {
     justify-content: center;
     align-items: center;
     font-weight: 600;
+
     color: var(--color);
     .image {
       width: 65%;
@@ -487,11 +489,13 @@ ul {
       position: absolute;
       width: 100%;
       height: 80%;
-      background-color: #ebebeb;
+      background-color: var(--bg-color);
       z-index: -1;
       bottom: -10%;
       border-radius: 30px;
+      border: 1px solid ;
     }
+
   }
   .team .container .sec-team .team-members.side-scrolling-container {
     overflow: hidden;
@@ -587,6 +591,7 @@ ul {
     font-weight: 400;
     max-width: 80%;
     line-height: 1.2;
+    color: var(--dark-font-color);
   }
 }
 .contact-US .container .sec-1 .social {
@@ -767,8 +772,8 @@ ul {
 }
 
 /* Card Components */
-.card {
-  background: rgba(255, 255, 255, 0.95);
+.app .card {
+  background: var(--bg-color);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
@@ -777,26 +782,26 @@ ul {
   transition: all 0.3s ease;
 }
 
-.card:hover {
+.app .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   border-color: rgba(59, 130, 246, 0.3);
 }
 
-.card-header {
+.app .card-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
-.card-title {
+.app .card-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e40af;
+  color: var(--primary-color);
 }
 
-.card-icon {
+.app .card-icon {
   color: #3b82f6;
   width: 20px;
   height: 20px;
@@ -818,17 +823,17 @@ ul {
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--icon-color);
   margin-bottom: 0.5rem;
 }
 
 .form-select {
   width: 100%;
-  background: white;
+  background: var(--white-color);
   border: 2px solid #e5e7eb;
   border-radius: 12px;
   padding: 0.75rem 1rem;
-  color: #374151;
+  color: var(--dark-font-color);
   font-size: 0.875rem;
   transition: all 0.2s ease;
 }
@@ -880,14 +885,14 @@ ul {
 }
 
 .btn-secondary {
-  background: white;
-  color: #374151;
+  background: var(--white-color);
+  color: var(--dark-font-color);
   border: 2px solid #e5e7eb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
+  background: var(--bg-color);
   border-color: #3b82f6;
   color: #3b82f6;
 }
@@ -910,14 +915,14 @@ ul {
 }
 
 .expression-content {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: var(--bg-color);
   border-radius: 12px;
   padding: 1rem;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.875rem;
   word-break: break-all;
-  border: 2px solid #e2e8f0;
-  color: #1e40af;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
   font-weight: 500;
 }
 
@@ -976,6 +981,7 @@ ul {
   padding: 0.75rem;
   text-align: center;
   border-bottom: 1px solid #e5e7eb;
+  color: var(--dark-font-color);
 }
 
 .truth-table th {
@@ -995,7 +1001,7 @@ ul {
 }
 
 .truth-table .index-cell {
-  color: #6b7280;
+  color: var(--dark-font-color);
   font-weight: 500;
 }
 
@@ -1029,9 +1035,7 @@ ul {
 }
 
 /* Karnaugh Map */
-.kmap-table-container {
-  overflow-x: auto;
-}
+
 
 .kmap-table {
   border-collapse: collapse;
@@ -1040,7 +1044,7 @@ ul {
 
 .kmap-table th,
 .kmap-table td {
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--primary-color--60);
   width: 60px;
   height: 60px;
   text-align: center;
@@ -1049,16 +1053,19 @@ ul {
 }
 
 .kmap-table th {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background:var(--primary-color);
   font-size: 0.75rem;
-  color: #374151;
+  color:white;
   font-weight: 600;
+  font-size: 14px;
 }
 
 .kmap-cell {
   cursor: pointer;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--bg-color);
+  color: var(--dark-font-color);
+
 }
 
 .kmap-cell:hover {
@@ -1156,7 +1163,9 @@ ul {
   background: transparent;
   color: #9ca3af;
 }
-
+.react-flow__background{
+  background-color: var(--bg-color);
+}
 /* Alert/Warning */
 .alert {
   display: flex;
@@ -1264,7 +1273,7 @@ ul {
   }
 }
 
-.card {
+.app .card {
   animation: fadeIn 0.6s ease-out;
 }
 
@@ -1317,7 +1326,7 @@ ul {
 }
 
 /* Enhanced Visual Effects */
-.card::before {
+.app .card::before {
   content: '';
   position: absolute;
   top: 0;

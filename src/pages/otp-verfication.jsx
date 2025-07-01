@@ -38,7 +38,6 @@ const OTPVerification = () => {
       setFeedbackMessage("Please enter a 6-digit OTP.");
       return;
     }
-
     try {
       const response = await fetch("https://gadetguru.mgheit.com/api/verify-otp", {
         method: "POST",
@@ -47,9 +46,7 @@ const OTPVerification = () => {
         },
         body: JSON.stringify({ email, otp: otpValue }),
       });
-      const data = await response.json();
-      console.log(data.data);
-      
+      const data = await response.json();      
       if (data.data ) {
         setFeedbackMessage("OTP verified successfully!");
         setTimeout(() => {

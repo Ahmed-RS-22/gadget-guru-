@@ -4,6 +4,7 @@ import logo from "../assets/logo-1.png";
 import "../styles/models.css"; // Assuming your CSS file for styling
 import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import {Cpu} from "lucide-react"; 
 const Header = ({ isUserLogged, onLogout }) => {
   const darkRef = useRef();
   const navigate = useNavigate();
@@ -12,13 +13,11 @@ const Header = ({ isUserLogged, onLogout }) => {
     location.state?.user || JSON.parse(localStorage.getItem("userInfo"));
   const [myuser, setMyuser] = useState({});
   const [isDark, setIsDark] = useState(false);
-  const count = 2;
   const [userInfo, setUserInfo] = useState({
     token: JSON.parse(localStorage.getItem("userInfo"))?.token,
     isUserLoggedIn: JSON.parse(localStorage.getItem("userInfo"))
       ?.isUserLoggedIn,
-  });
-  useEffect(() => {}, [count]);
+  }); 
   const getUserInfo = async () => {
     if (JSON.parse(localStorage.getItem("userInfo")).isUserLoggedIn || token) {
       try {
@@ -274,10 +273,9 @@ const Header = ({ isUserLogged, onLogout }) => {
           {/* User Actions */}
           <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
             <ul className="user-actions">
-              <li className="icon icon-1 sp">
-                <span className="count">{count}</span>
-                <i class="fa-regular fa-bookmark"></i>
-              </li>
+              <Link className="icon icon-1 sp" to={"/logic"}>
+                <Cpu size={32}/>
+              </Link>
               <li className="icon icon-1 dropdown">
                 <i class="fa-solid fa-circle-user" onClick={handleUserMenu}></i>
                 {/* user control  */}

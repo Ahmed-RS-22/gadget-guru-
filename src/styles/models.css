@@ -263,7 +263,7 @@ header.header .container i.fa-user {
   display: none;
   color: var(--primary-color);
 }
-header.header .container .user a {
+header.header .container .user a:not(.icon-1) {
   text-decoration: none;
   padding: 5px 18px;
   border: 1px solid;
@@ -483,21 +483,8 @@ header.header .container .user a.register {
 }
 .user .user-actions .icon.icon-1.sp {
   position: relative;
-
-  span.count{
-    position: absolute;
-    font-size: 16px;
-    background-color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    top: 0;
-    right: 0;
-    color: var(--primary-color);
-  }
+  background-color: var(--primary-color);
+  color: var(--white-color);
 }
 .user .user-actions .icon.dropdown {
   background-color: var(--light-font-color-3);

@@ -118,6 +118,8 @@ const Register = ({ onRegister }) => {
           token: user.token,
           isUserLoggedIn: true,
         });
+        console.log(user);
+
         // sending user info to header
         setTimeout(() => {
           navigate("/home",{state:{user}});
