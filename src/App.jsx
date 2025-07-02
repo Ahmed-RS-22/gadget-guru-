@@ -20,36 +20,66 @@ import ResetPassword from "./pages/reset-password";
 import Logic from "./pages/logic";
 import Home from "./pages/main";
 import TermsAndConditions from "./pages/terms-conditions";
+
 function App() {
-  // const navigate = useNavigate();
-    const [userInfo, setUserInfo] = useState({
-      token:JSON.parse(localStorage.getItem("userInfo"))?.token || "",
-      isUserLoggedIn:JSON.parse(localStorage.getItem("userInfo"))?.isUserLoggedIn || false,
-    });
-    useEffect(() => {
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));      
-    },[userInfo]);
-  
+  // Initialize userInfo from localStorage
+  const [userInfo, setUserInfo] = useState(() => {
+    try {
+      const stored = localStorage.getItem("userInfo");
+      return stored ? JSON.parse(stored) : {
+        token: "",
+        isUserLoggedIn: false,
+      };
+    } catch (error) {
+      console.error("Error parsing userInfo from localStorage:", error);
+      return {
+        token: "",
+        isUserLoggedIn: false,
+      };
+    }
+  });
+
   const [isUserLogged, setIsUserLogged] = useState(userInfo?.isUserLoggedIn || false);
-  // Check if user is already logged in
-  function updateLoginStatus() {
-    setIsUserLogged(isUserLogged );
-  }
-useEffect(() => {
-  updateLoginStatus();
-} );
+
+  // Update localStorage whenever userInfo changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+      setIsUserLogged(userInfo.isUserLoggedIn);
+    } catch (error) {
+      console.error("Error saving userInfo to localStorage:", error);
+    }
+  }, [userInfo]);
 
   const handleLogin = () => {
-    setIsUserLogged(true); // Set to true after login    
+    // Get the latest userInfo from localStorage in case it was updated by social login
+    try {
+      const latestUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+      if (latestUserInfo && latestUserInfo.isUserLoggedIn) {
+        setUserInfo(latestUserInfo);
+        setIsUserLogged(true);
+      } else {
+        setIsUserLogged(true);
+      }
+    } catch (error) {
+      console.error("Error reading userInfo during login:", error);
+      setIsUserLogged(true);
+    }
   };
 
   const handleLogout = () => {
-    setIsUserLogged(false); // Set to false on logout
+    const resetUserInfo = {
+      token: "",
+      isUserLoggedIn: false,
+    };
+    setUserInfo(resetUserInfo);
+    setIsUserLogged(false);
+    localStorage.setItem("userInfo", JSON.stringify(resetUserInfo));
   };
-  return (
 
+  return (
     <HashRouter basename="/"> 
-      <Header isUserLogged={isUserLogged} onLogout={handleLogout} ></Header>
+      <Header isUserLogged={isUserLogged} onLogout={handleLogout} />
       <Routes>
         <Route path="" element={<Home />} />
         <Route path="/home" element={<Home />} />

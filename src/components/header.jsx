@@ -5,40 +5,87 @@ import "../styles/models.css"; // Assuming your CSS file for styling
 import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {Cpu} from "lucide-react"; 
+
 const Header = ({ isUserLogged, onLogout }) => {
   const darkRef = useRef();
   const navigate = useNavigate();
   const location = useLocation();
-  const token =
-    location.state?.user || JSON.parse(localStorage.getItem("userInfo"));
+  
+  // Get userInfo from localStorage consistently
+  const [userInfo, setUserInfo] = useState(() => {
+    try {
+      const stored = localStorage.getItem("userInfo");
+      return stored ? JSON.parse(stored) : { token: "", isUserLoggedIn: false };
+    } catch (error) {
+      console.error("Error parsing userInfo:", error);
+      return { token: "", isUserLoggedIn: false };
+    }
+  });
+
   const [myuser, setMyuser] = useState({});
   const [isDark, setIsDark] = useState(false);
-  const [userInfo, setUserInfo] = useState({
-    token: JSON.parse(localStorage.getItem("userInfo"))?.token,
-    isUserLoggedIn: JSON.parse(localStorage.getItem("userInfo"))
-      ?.isUserLoggedIn,
-  }); 
-  const getUserInfo = async () => {
-    if (JSON.parse(localStorage.getItem("userInfo")).isUserLoggedIn || token) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showNav, setShowNav] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  // Update userInfo when localStorage changes (for social login)
+  useEffect(() => {
+    const handleStorageChange = () => {
       try {
-        const response = await axios
-          .get("https://gadetguru.mgheit.com/api/profile", {
-            headers: {
-              Authorization: `Bearer ${token.token}`,
-              Accept: "application/json",
-            },
-          })
-            const result = response.data.data;
-            setMyuser(result);
+        const stored = localStorage.getItem("userInfo");
+        if (stored) {
+          const parsedUserInfo = JSON.parse(stored);
+          setUserInfo(parsedUserInfo);
+        }
       } catch (error) {
-        console.log(error);
+        console.error("Error parsing userInfo from storage:", error);
+      }
+    };
+
+    // Listen for storage changes
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check on component mount and when isUserLogged changes
+    handleStorageChange();
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [isUserLogged]);
+
+  const getUserInfo = async () => {
+    // Use the current userInfo state instead of localStorage directly
+    if ((userInfo?.isUserLoggedIn && userInfo?.token) || isUserLogged) {
+      try {
+        const token = userInfo?.token;
+        if (!token) {
+          console.error("No token available for API call");
+          return;
+        }
+
+        const response = await axios.get("https://gadetguru.mgheit.com/api/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        
+        const result = response.data.data;
+        setMyuser(result);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        // If token is invalid, logout the user
+        if (error.response?.status === 401) {
+          handlelogout();
+        }
       }
     }
   };
+
   useEffect(() => {
     getUserInfo();
-  }, );   
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  }, [userInfo, isUserLogged]);
+
   const handleNavigation = (path, sectionId) => {
     if (location.pathname === path) {
       // Scroll within the current page
@@ -51,9 +98,6 @@ const Header = ({ isUserLogged, onLogout }) => {
       navigate(`${path}#${sectionId}`);
     }
   };
-  // State to toggle navigation and user menu
-  const [showNav, setShowNav] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Toggle nav menu
   const toggleNav = () => {
@@ -85,9 +129,10 @@ const Header = ({ isUserLogged, onLogout }) => {
     document.addEventListener("click", closeMenus);
     return () => document.removeEventListener("click", closeMenus);
   }, []);
+
   React.useEffect(() => {
     document.addEventListener("click", closeUserMenus);
-    return () => document.removeEventListener("click", closeMenus);
+    return () => document.removeEventListener("click", closeUserMenus);
   }, []);
 
   useEffect(() => {
@@ -140,49 +185,60 @@ const Header = ({ isUserLogged, onLogout }) => {
       window.removeEventListener("scroll", onScroll);
     };
   });
+
   const handlelogout = async () => {
     // sending token  to api endpoint
     try {
-      const response = await fetch("https://gadetguru.mgheit.com/api/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token?.token} `,
-        },
-      });
-      console.log(response);
+      const token = userInfo?.token;
+      if (token) {
+        const response = await fetch("https://gadetguru.mgheit.com/api/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(response);
 
-      if (!response.ok) {
-        throw new Error("Logout failed.");
+        if (!response.ok) {
+          throw new Error("Logout failed.");
+        }
+        const result = await response.json();
+        console.log("Success:", result);
       }
-      const result = await response.json();
-      console.log("Success:", result);
 
-      // set the user login status to false
-      setUserInfo({
+      // Clear user data
+      const resetUserInfo = {
         token: "",
         isUserLoggedIn: false,
-      }); // redirect to login page
-      setMyuser({
-        ...myuser,
-        is_verified: false,
-        token: "",
-      });
+      };
+      
+      setUserInfo(resetUserInfo);
+      setMyuser({});
+      localStorage.setItem("userInfo", JSON.stringify(resetUserInfo));
+      
       onLogout();
       navigate("/login");
     } catch (error) {
-      console.error(error);
+      console.error("Logout error:", error);
+      // Even if API call fails, clear local data
+      const resetUserInfo = {
+        token: "",
+        isUserLoggedIn: false,
+      };
+      setUserInfo(resetUserInfo);
+      setMyuser({});
+      localStorage.setItem("userInfo", JSON.stringify(resetUserInfo));
+      onLogout();
+      navigate("/login");
     }
   };
-  useEffect(() => {
-    if (userInfo) {
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));
-    }
-  }, [userInfo]);
+
   const handleUserMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
   const closeUserMenus = (e) => {
     if (
       !e.target.closest(".fa-user") &&
@@ -192,6 +248,7 @@ const Header = ({ isUserLogged, onLogout }) => {
       setIsMenuOpen(false);
     }
   };
+
   const handleDarkMode = () => {
     if (darkRef.current.checked) {
       setIsDark(true);
@@ -201,7 +258,11 @@ const Header = ({ isUserLogged, onLogout }) => {
       setIsDark(false);
     }
   };
-  if (myuser?.is_verified || isUserLogged) {
+
+  // Check if user is logged in using both props and userInfo state
+  const isLoggedIn = isUserLogged || (userInfo?.isUserLoggedIn && userInfo?.token);
+
+  if (isLoggedIn) {
     return (
       <header className="header">
         <div className="container">
@@ -266,7 +327,6 @@ const Header = ({ isUserLogged, onLogout }) => {
                 </Link>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </a>
-              {/* <input type="text" name="search" id="search" placeholder="search" /> */}
             </div>
           </nav>
 
@@ -277,7 +337,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                 <Cpu size={32}/>
               </Link>
               <li className="icon icon-1 dropdown">
-                <i class="fa-solid fa-circle-user" onClick={handleUserMenu}></i>
+                <i className="fa-solid fa-circle-user" onClick={handleUserMenu}></i>
                 {/* user control  */}
                 <div
                   className={`user-control ${
@@ -286,7 +346,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                 >
                   <div className="username">
                     <div className="icon">
-                      <i class="fa-solid fa-circle-user"></i>
+                      <i className="fa-solid fa-circle-user"></i>
                     </div>
                     <div className="user-detailes">
                       <span className="name">
@@ -300,7 +360,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                   <ul className="items">
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-solid fa-user-large"></i>
+                        <i className="fa-solid fa-user-large"></i>
                       </div>
                       <Link className="uc-link" to="/profile">
                         account
@@ -308,7 +368,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                     </li>
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-solid fa-bookmark"></i>
+                        <i className="fa-solid fa-bookmark"></i>
                       </div>
                       <Link className="uc-link" to="/saved">
                         saved ICs
@@ -316,7 +376,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                     </li>
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-solid fa-star"></i>
+                        <i className="fa-solid fa-star"></i>
                       </div>
                       <Link className="uc-link" to="/popular">
                         Popular ICs
@@ -332,7 +392,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                     </li>
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-solid fa-circle-question"></i>
+                        <i className="fa-solid fa-circle-question"></i>
                       </div>
                       <Link className="uc-link" to="/tersms-and-conditions">
                         help center{" "}
@@ -343,7 +403,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                     <div className="info">
                       <div className="icon-2">
                         <i
-                          class={`${
+                          className={`${
                             isDark ? "fa-solid fa-moon" : "fa-solid fa-sun "
                           }`}
                         ></i>
@@ -361,7 +421,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                   </div>
                   <div className="log-out" onClick={handlelogout}>
                     <div className="icon-2">
-                      <i class="fa-solid fa-right-from-bracket"></i>
+                      <i className="fa-solid fa-right-from-bracket"></i>
                     </div>
                     log out
                   </div>
@@ -446,7 +506,6 @@ const Header = ({ isUserLogged, onLogout }) => {
                   </Link>
                   <i className="fa-solid fa-magnifying-glass"></i>
                 </a>
-                {/* <input type="text" name="search" id="search" placeholder="search" /> */}
               </div>
             </nav>
 
