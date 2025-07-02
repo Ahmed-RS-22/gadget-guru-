@@ -12,9 +12,7 @@ const Popular = () => {
               Accept: "application/json",
             },
           });
-          const Ics =response.data.data 
-          console.log(Ics);
-          
+          const Ics =response.data.data           
           if(Ics.length > 0){
             setComponents(Ics);
           }else{
