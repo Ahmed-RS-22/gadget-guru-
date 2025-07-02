@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo-1.png";
-import "../styles/models.css"; // Assuming your CSS file for styling
+import "../styles/models.css";
 import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {Cpu} from "lucide-react"; 
@@ -10,6 +10,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
   const darkRef = useRef();
   const navigate = useNavigate();
   const location = useLocation();
+  const headerRef = useRef();
   
   // Use userInfo from props if available, otherwise from localStorage
   const [userInfo, setUserInfo] = useState(() => {
@@ -30,6 +31,29 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showNav, setShowNav] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Add scroll effect for header
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      setIsScrolled(scrollTop > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Update header class based on scroll
+  useEffect(() => {
+    if (headerRef.current) {
+      if (isScrolled) {
+        headerRef.current.classList.add('scrolled');
+      } else {
+        headerRef.current.classList.remove('scrolled');
+      }
+    }
+  }, [isScrolled]);
 
   // Update userInfo when props change (important for social login)
   useEffect(() => {
@@ -116,6 +140,10 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
   }, [getUserInfo]);
 
   const handleNavigation = (path, sectionId) => {
+    // Close mobile menus when navigating
+    setShowNav(false);
+    setShowUserMenu(false);
+    
     if (location.pathname === path) {
       // Scroll within the current page
       const section = document.getElementById(sectionId);
@@ -141,7 +169,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
   };
 
   // Close menus when clicking outside
-  const closeMenus = (e) => {
+  const closeMenus = useCallback((e) => {
     if (
       !e.target.closest(".fa-bars") &&
       !e.target.closest(".fa-user") &&
@@ -151,9 +179,9 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
       setShowNav(false);
       setShowUserMenu(false);
     }
-  };
+  }, []);
 
-  const closeUserMenus = (e) => {
+  const closeUserMenus = useCallback((e) => {
     if (
       !e.target.closest(".fa-user") &&
       !e.target.closest(".fa-circle-user") &&
@@ -161,10 +189,10 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
     ) {
       setIsMenuOpen(false);
     }
-  };
+  }, []);
 
   // Add event listener to close menus on click outside
-  React.useEffect(() => {
+  useEffect(() => {
     document.addEventListener("click", closeMenus);
     document.addEventListener("click", closeUserMenus);
     
@@ -172,7 +200,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
       document.removeEventListener("click", closeMenus);
       document.removeEventListener("click", closeUserMenus);
     };
-  }, []);
+  }, [closeMenus, closeUserMenus]);
 
   useEffect(() => {
     // Select all sections and nav links
@@ -180,6 +208,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
       "main  > section:not(:nth-child(4))"
     );
     const navLinks = document.querySelectorAll(".navbar .link a");
+    
     // Function to remove 'active' class from all nav links
     const removeActiveClasses = () => {
       navLinks.forEach((link) => link.classList.remove("active"));
@@ -281,22 +310,38 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
     if (darkRef.current.checked) {
       setIsDark(true);
       document.body.classList.add("dark");
+      localStorage.setItem("darkMode", "true");
     } else {
       document.body.classList.remove("dark");
       setIsDark(false);
+      localStorage.setItem("darkMode", "false");
     }
   };
+
+  // Load dark mode preference on mount
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem("darkMode");
+    if (savedDarkMode === "true") {
+      setIsDark(true);
+      document.body.classList.add("dark");
+      if (darkRef.current) {
+        darkRef.current.checked = true;
+      }
+    }
+  }, []);
 
   // Check if user is logged in using both props and userInfo state
   const isLoggedIn = isUserLogged || (userInfo?.isUserLoggedIn && userInfo?.token);
 
   if (isLoggedIn) {
     return (
-      <header className="header">
+      <header className="header" ref={headerRef}>
         <div className="container">
           {/* Logo */}
           <div className="logo">
-            <img src={logo} alt="logo" className="logo" />
+            <Link to="/home">
+              <img src={logo} alt="Gadget Guru Logo" className="logo" />
+            </Link>
           </div>
 
           {/* Navbar */}
@@ -361,7 +406,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
           {/* User Actions */}
           <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
             <ul className="user-actions">
-              <Link className="icon icon-1 sp" to={"/logic"}>
+              <Link className="icon icon-1 sp" to={"/logic"} title="Karnaugh Map Tool">
                 <Cpu size={32}/>
               </Link>
               <li className="icon icon-1 dropdown">
@@ -391,7 +436,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                         <i className="fa-solid fa-user-large"></i>
                       </div>
                       <Link className="uc-link" to="/profile">
-                        account
+                        Account
                       </Link>
                     </li>
                     <li className="item">
@@ -399,7 +444,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                         <i className="fa-solid fa-bookmark"></i>
                       </div>
                       <Link className="uc-link" to="/saved">
-                        saved ICs
+                        Saved ICs
                       </Link>
                     </li>
                     <li className="item">
@@ -415,7 +460,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                         <Cpu size={24}/>
                       </div>
                       <Link className="uc-link" to="/logic">
-                        Karnough map 
+                        Karnaugh Map 
                       </Link>
                     </li>
                     <li className="item">
@@ -423,7 +468,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                         <i className="fa-solid fa-circle-question"></i>
                       </div>
                       <Link className="uc-link" to="/tersms-and-conditions">
-                        help center{" "}
+                        Help Center
                       </Link>
                     </li>
                   </ul>
@@ -436,7 +481,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                           }`}
                         ></i>
                       </div>
-                       &nbsp;  dark mode
+                       &nbsp;  Dark Mode
                     </div>
                     <label className="switch">
                       <input
@@ -451,15 +496,15 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                     <div className="icon-2">
                       <i className="fa-solid fa-right-from-bracket"></i>
                     </div>
-                    log out
+                    Log Out
                   </div>
                 </div>
               </li>
-              <span>{myuser?.first_name || "username"}</span>
+              <span>{myuser?.first_name || "User"}</span>
             </ul>
           </div>
 
-          {/* Icons */}
+          {/* Mobile Icons */}
           <i className="fa fa-user" onClick={toggleUserMenu}></i>
           <i className="fa fa-bars" onClick={toggleNav}></i>
         </div>
@@ -467,92 +512,92 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
     );
   } else {
     return (
-      <>
-        <header className="header">
-          <div className="container">
-            {/* Logo */}
-            <div className="logo">
-              <img src={logo} alt="logo" className="logo" />
-            </div>
+      <header className="header" ref={headerRef}>
+        <div className="container">
+          {/* Logo */}
+          <div className="logo">
+            <Link to="/home">
+              <img src={logo} alt="Gadget Guru Logo" className="logo" />
+            </Link>
+          </div>
 
-            {/* Navbar */}
-            <nav className="navbar">
-              <ul
-                className={`nav-links ${showNav ? "show" : ""}`}
-                id="navLinks"
-              >
-                <li className="link">
-                  <a
-                    className="active"
-                    onClick={() => handleNavigation("/home", "home-Section")}
-                    name="home-Section"
-                  >
-                    Home
-                  </a>
-                </li>
-                <li className="link">
-                  <a
-                    onClick={() => handleNavigation("/home", "about-us")}
-                    name="about-us"
-                  >
-                    About US
-                  </a>
-                </li>
-                <li className="link">
-                  <a
-                    onClick={() => handleNavigation("/home", "ic-id")}
-                    name="ic-id"
-                  >
-                    Services
-                  </a>
-                </li>
-                <li className="link">
-                  <a
-                    onClick={() => handleNavigation("/home", "contactUS")}
-                    name="contactUS"
-                  >
-                    Contact Us
-                  </a>
-                </li>
-              </ul>
-
-              {/* Search */}
-              <div className="search">
+          {/* Navbar */}
+          <nav className="navbar">
+            <ul
+              className={`nav-links ${showNav ? "show" : ""}`}
+              id="navLinks"
+            >
+              <li className="link">
+                <a
+                  className="active"
+                  onClick={() => handleNavigation("/home", "home-Section")}
+                  name="home-Section"
+                >
+                  Home
+                </a>
+              </li>
+              <li className="link">
+                <a
+                  onClick={() => handleNavigation("/home", "about-us")}
+                  name="about-us"
+                >
+                  About US
+                </a>
+              </li>
+              <li className="link">
                 <a
                   onClick={() => handleNavigation("/home", "ic-id")}
                   name="ic-id"
                 >
-                  <Link
-                    to={{ hash: "#searching" }}
-                    style={{
-                      padding: "0",
-                      border: "none",
-                      textDecoration: "none",
-                    }}
-                  >
-                    search
-                  </Link>
-                  <i className="fa-solid fa-magnifying-glass"></i>
+                  Services
                 </a>
-              </div>
-            </nav>
+              </li>
+              <li className="link">
+                <a
+                  onClick={() => handleNavigation("/home", "contactUS")}
+                  name="contactUS"
+                >
+                  Contact Us
+                </a>
+              </li>
+            </ul>
 
-            {/* User Actions */}
-            <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
-              <Link to="/login" className="signin" id="signIn">
-                Sign In
-              </Link>
-              <Link to="/register" className="register" id="Reg">
-                Sign Up
-              </Link>
+            {/* Search */}
+            <div className="search">
+              <a
+                onClick={() => handleNavigation("/home", "ic-id")}
+                name="ic-id"
+              >
+                <Link
+                  to={{ hash: "#searching" }}
+                  style={{
+                    padding: "0",
+                    border: "none",
+                    textDecoration: "none",
+                  }}
+                >
+                  search
+                </Link>
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </a>
             </div>
+          </nav>
 
-            {/* Icons */}
-            <i className="fa fa-user" onClick={toggleUserMenu}></i>
-            <i className="fa fa-bars" onClick={toggleNav}></i>
+          {/* User Actions */}
+          <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
+            <Link to="/login" className="signin" id="signIn">
+              Sign In
+            </Link>
+            <Link to="/register" className="register" id="Reg">
+              Sign Up
+            </Link>
           </div>
-        </header>{" "}
-      </>
+
+          {/* Mobile Icons */}
+          <i className="fa fa-user" onClick={toggleUserMenu}></i>
+          <i className="fa fa-bars" onClick={toggleNav}></i>
+        </div>
+      </header>
     );
   }
 };
