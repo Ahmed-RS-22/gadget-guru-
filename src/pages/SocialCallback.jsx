@@ -10,10 +10,7 @@ export default function SocialCallback({ onLogin }) {
     const token = params.get('token');
     console.log('Token from URL:', token);
     if (token) {
-      localStorage.setItem(
-        'userInfo',
-        JSON.stringify({ token, isUserLoggedIn: true })
-      );
+      localStorage.setItem("userInfo", JSON.stringify(token));
       onLogin();
       navigate('/home');
     } else {
