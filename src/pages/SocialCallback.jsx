@@ -8,6 +8,7 @@ export default function SocialCallback({ onLogin }) {
   useEffect(() => {
     const params = new URLSearchParams(search);
     const token = params.get('token');
+    console.log('Token from URL:', token);
     if (token) {
       localStorage.setItem(
         'userInfo',

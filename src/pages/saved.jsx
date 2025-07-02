@@ -51,7 +51,6 @@ const Saved = () => {
   useEffect(() => {
     fetchComponents();
   }, []);
-
   const handleSearch = (searchTerm) => {
     setSearch(searchTerm);
 
