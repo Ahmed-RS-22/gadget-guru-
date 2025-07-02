@@ -41,6 +41,32 @@ function App() {
 
   const [isUserLogged, setIsUserLogged] = useState(userInfo?.isUserLoggedIn || false);
 
+  // Listen for storage changes (for social login and other tabs)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'userInfo' || e.key === null) {
+        try {
+          const stored = localStorage.getItem("userInfo");
+          if (stored) {
+            const parsedUserInfo = JSON.parse(stored);
+            // Update both userInfo and isUserLogged states
+            setUserInfo(parsedUserInfo);
+            setIsUserLogged(parsedUserInfo.isUserLoggedIn);
+          }
+        } catch (error) {
+          console.error("Error parsing userInfo from storage event:", error);
+        }
+      }
+    };
+
+    // Listen for storage changes from other tabs/windows
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   // Update localStorage whenever userInfo changes - but prevent infinite loops
   useEffect(() => {
     try {
@@ -59,33 +85,27 @@ function App() {
     } catch (error) {
       console.error("Error saving userInfo to localStorage:", error);
     }
-  }, [userInfo]); // Remove isUserLogged from dependencies to prevent loop
+  }, [userInfo, isUserLogged]);
 
   // Memoize the login handler to prevent unnecessary re-renders
   const handleLogin = useCallback(() => {
     try {
+      // Force re-read from localStorage to get the latest data
       const latestUserInfo = JSON.parse(localStorage.getItem("userInfo"));
       if (latestUserInfo && latestUserInfo.isUserLoggedIn && latestUserInfo.token) {
-        // Only update state if it's actually different
-        if (latestUserInfo.token !== userInfo.token || 
-            latestUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn) {
-          setUserInfo(latestUserInfo);
-        }
-        if (!isUserLogged) {
-          setIsUserLogged(true);
-        }
+        // Update both states immediately
+        setUserInfo(latestUserInfo);
+        setIsUserLogged(true);
       } else {
-        if (!isUserLogged) {
-          setIsUserLogged(true);
-        }
+        // Fallback - just set logged in state
+        setIsUserLogged(true);
       }
     } catch (error) {
       console.error("Error reading userInfo during login:", error);
-      if (!isUserLogged) {
-        setIsUserLogged(true);
-      }
+      // Fallback - just set logged in state
+      setIsUserLogged(true);
     }
-  }, [userInfo.token, userInfo.isUserLoggedIn, isUserLogged]);
+  }, []);
 
   // Memoize the logout handler
   const handleLogout = useCallback(() => {
@@ -100,7 +120,11 @@ function App() {
 
   return (
     <HashRouter basename="/"> 
-      <Header isUserLogged={isUserLogged} onLogout={handleLogout} />
+      <Header 
+        isUserLogged={isUserLogged} 
+        onLogout={handleLogout}
+        userInfo={userInfo} // Pass userInfo as well for better sync
+      />
       <Routes>
         <Route path="" element={<Home />} />
         <Route path="/home" element={<Home />} />

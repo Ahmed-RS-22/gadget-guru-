@@ -22,13 +22,16 @@ export default function SocialCallback({ onLogin }) {
           // Save to localStorage immediately
           localStorage.setItem('userInfo', JSON.stringify(userInfo));
           
+          // Dispatch a custom event to notify other components
+          window.dispatchEvent(new CustomEvent('userLoggedIn', { detail: userInfo }));
+          
           // Call the login handler
           onLogin();
           
-          // Small delay to ensure state updates
+          // Force a small delay to ensure all state updates complete
           setTimeout(() => {
             navigate('/home', { replace: true });
-          }, 100);
+          }, 200);
         } else {
           console.error('No token received from social login');
           navigate('/login', { replace: true });
@@ -52,9 +55,25 @@ export default function SocialCallback({ onLogin }) {
         alignItems: 'center', 
         height: '100vh',
         fontSize: '18px',
-        color: '#007aff'
+        color: '#007aff',
+        flexDirection: 'column',
+        gap: '20px'
       }}>
-        Finishing login...
+        <div>Finishing login...</div>
+        <div style={{ 
+          width: '40px', 
+          height: '40px', 
+          border: '4px solid #f3f3f3',
+          borderTop: '4px solid #007aff',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }

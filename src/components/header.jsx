@@ -6,13 +6,16 @@ import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {Cpu} from "lucide-react"; 
 
-const Header = ({ isUserLogged, onLogout }) => {
+const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
   const darkRef = useRef();
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Get userInfo from localStorage consistently
+  // Use userInfo from props if available, otherwise from localStorage
   const [userInfo, setUserInfo] = useState(() => {
+    if (propUserInfo && propUserInfo.token) {
+      return propUserInfo;
+    }
     try {
       const stored = localStorage.getItem("userInfo");
       return stored ? JSON.parse(stored) : { token: "", isUserLoggedIn: false };
@@ -28,17 +31,23 @@ const Header = ({ isUserLogged, onLogout }) => {
   const [showNav, setShowNav] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
+  // Update userInfo when props change (important for social login)
+  useEffect(() => {
+    if (propUserInfo && propUserInfo.token && 
+        (propUserInfo.token !== userInfo.token || 
+         propUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn)) {
+      setUserInfo(propUserInfo);
+    }
+  }, [propUserInfo, userInfo.token, userInfo.isUserLoggedIn]);
+
   // Memoize getUserInfo to prevent unnecessary re-renders
   const getUserInfo = useCallback(async () => {
-    // Use the current userInfo state instead of localStorage directly
-    if ((userInfo?.isUserLoggedIn && userInfo?.token) || isUserLogged) {
+    // Check both prop and state for login status
+    const isLoggedIn = isUserLogged || userInfo?.isUserLoggedIn;
+    const token = userInfo?.token;
+    
+    if (isLoggedIn && token) {
       try {
-        const token = userInfo?.token;
-        if (!token) {
-          console.error("No token available for API call");
-          return;
-        }
-
         const response = await axios.get("https://gadetguru.mgheit.com/api/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -64,7 +73,7 @@ const Header = ({ isUserLogged, onLogout }) => {
     }
   }, [userInfo?.token, userInfo?.isUserLoggedIn, isUserLogged]);
 
-  // Update userInfo when localStorage changes (for social login) - but prevent loops
+  // Listen for localStorage changes (for social login and cross-tab sync)
   useEffect(() => {
     const handleStorageChange = () => {
       try {
@@ -85,15 +94,19 @@ const Header = ({ isUserLogged, onLogout }) => {
     // Listen for storage changes
     window.addEventListener('storage', handleStorageChange);
     
-    // Check on component mount only
-    handleStorageChange();
+    // Also listen for a custom event we'll dispatch after social login
+    const handleLoginEvent = () => {
+      handleStorageChange();
+    };
+    window.addEventListener('userLoggedIn', handleLoginEvent);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userLoggedIn', handleLoginEvent);
     };
-  }, []); // Empty dependency array to run only once
+  }, [userInfo.token, userInfo.isUserLoggedIn]);
 
-  // Call getUserInfo when userInfo or isUserLogged changes, but with debouncing
+  // Call getUserInfo when userInfo or login status changes, but with debouncing
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       getUserInfo();
