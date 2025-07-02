@@ -22,7 +22,7 @@ export default function SocialCallback({ onLogin }) {
         JSON.stringify(userInfo)
       );
       onLogin();
-      navigate('/home');
+      navigate(-1);
     } else {
       navigate('/login');
     }
