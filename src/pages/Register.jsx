@@ -113,16 +113,15 @@ const Register = ({ onRegister }) => {
         setFeedback({ message: result.message, success: true });
 
         //  save the user token to local storag
-        onRegister();
+        onRegister(user);
         setUserInfo({
           token: user.token,
           isUserLoggedIn: true,
         });
-        console.log(user);
 
         // sending user info to header
         setTimeout(() => {
-          navigate("/home",{state:{user}});
+          navigate("/home");
         }, 4000);
       } catch (error) {
         console.error("Error:", error);

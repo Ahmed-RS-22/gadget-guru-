@@ -51,14 +51,15 @@ const Login = ({ onLogin }) => {
       const user = result.data;
       //  save the user token to local storage
       console.log(user);
-
-      onLogin();
+      
+      onLogin(user);
       setUserInfo({
         token: user.token,
         isUserLoggedIn: true,
       });
+      
       setTimeout(() => {
-        navigate("/home", { state: { user } });
+        navigate("/home");
       }, 3000);
       setFeedback({ message: "Login successful!", success: true });
     } catch (error) {
@@ -168,6 +169,15 @@ const Login = ({ onLogin }) => {
                 }}
               >
                 <i className="fa-brands fa-google"></i> Sign in with Google
+              </button>
+              <button
+                className="google-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSocialLogin("Github");
+                }}
+              >
+                <i className="fa-brands fa-github"></i> Sign in with Github
               </button>
             </fieldset>
           </div>

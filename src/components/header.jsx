@@ -1,45 +1,149 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo-1.png";
-import "../styles/models.css"; // Assuming your CSS file for styling
+import "../styles/models.css";
 import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {Cpu} from "lucide-react"; 
-const Header = ({ isUserLogged, onLogout }) => {
+
+const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
   const darkRef = useRef();
   const navigate = useNavigate();
   const location = useLocation();
-  const token =
-    location.state?.user || JSON.parse(localStorage.getItem("userInfo"));
+  const headerRef = useRef();
+  
+  // Use userInfo from props if available, otherwise from localStorage
+  const [userInfo, setUserInfo] = useState(() => {
+    if (propUserInfo && propUserInfo.token) {
+      return propUserInfo;
+    }
+    try {
+      const stored = localStorage.getItem("userInfo");
+      return stored ? JSON.parse(stored) : { token: "", isUserLoggedIn: false };
+    } catch (error) {
+      console.error("Error parsing userInfo:", error);
+      return { token: "", isUserLoggedIn: false };
+    }
+  });
+
   const [myuser, setMyuser] = useState({});
   const [isDark, setIsDark] = useState(false);
-  const [userInfo, setUserInfo] = useState({
-    token: JSON.parse(localStorage.getItem("userInfo"))?.token,
-    isUserLoggedIn: JSON.parse(localStorage.getItem("userInfo"))
-      ?.isUserLoggedIn,
-  }); 
-  const getUserInfo = async () => {
-    if (JSON.parse(localStorage.getItem("userInfo")).isUserLoggedIn || token) {
-      try {
-        const response = await axios
-          .get("https://gadetguru.mgheit.com/api/profile", {
-            headers: {
-              Authorization: `Bearer ${token.token}`,
-              Accept: "application/json",
-            },
-          })
-            const result = response.data.data;
-            setMyuser(result);
-      } catch (error) {
-        console.log(error);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showNav, setShowNav] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Add scroll effect for header
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      setIsScrolled(scrollTop > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Update header class based on scroll
+  useEffect(() => {
+    if (headerRef.current) {
+      if (isScrolled) {
+        headerRef.current.classList.add('scrolled');
+      } else {
+        headerRef.current.classList.remove('scrolled');
       }
     }
-  };
+  }, [isScrolled]);
+
+  // Update userInfo when props change (important for social login)
   useEffect(() => {
-    getUserInfo();
-  }, );   
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+    if (propUserInfo && propUserInfo.token && 
+        (propUserInfo.token !== userInfo.token || 
+         propUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn)) {
+      setUserInfo(propUserInfo);
+    }
+  }, [propUserInfo, userInfo.token, userInfo.isUserLoggedIn]);
+
+  // Memoize getUserInfo to prevent unnecessary re-renders
+  const getUserInfo = useCallback(async () => {
+    // Check both prop and state for login status
+    const isLoggedIn = isUserLogged || userInfo?.isUserLoggedIn;
+    const token = userInfo?.token;
+    
+    if (isLoggedIn && token) {
+      try {
+        const response = await axios.get("https://gadetguru.mgheit.com/api/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        
+        const result = response.data.data;
+        setMyuser(prevUser => {
+          // Only update if the data has actually changed
+          if (JSON.stringify(prevUser) !== JSON.stringify(result)) {
+            return result;
+          }
+          return prevUser;
+        });
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        // If token is invalid, logout the user
+        if (error.response?.status === 401) {
+          handlelogout();
+        }
+      }
+    }
+  }, [userInfo?.token, userInfo?.isUserLoggedIn, isUserLogged]);
+
+  // Listen for localStorage changes (for social login and cross-tab sync)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem("userInfo");
+        if (stored) {
+          const parsedUserInfo = JSON.parse(stored);
+          // Only update if the data has actually changed
+          if (parsedUserInfo.token !== userInfo.token || 
+              parsedUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn) {
+            setUserInfo(parsedUserInfo);
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing userInfo from storage:", error);
+      }
+    };
+
+    // Listen for storage changes
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for a custom event we'll dispatch after social login
+    const handleLoginEvent = () => {
+      handleStorageChange();
+    };
+    window.addEventListener('userLoggedIn', handleLoginEvent);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userLoggedIn', handleLoginEvent);
+    };
+  }, [userInfo.token, userInfo.isUserLoggedIn]);
+
+  // Call getUserInfo when userInfo or login status changes, but with debouncing
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      getUserInfo();
+    }, 100); // Small delay to prevent rapid calls
+
+    return () => clearTimeout(timeoutId);
+  }, [getUserInfo]);
+
   const handleNavigation = (path, sectionId) => {
+    // Close mobile menus when navigating
+    setShowNav(false);
+    setShowUserMenu(false);
+    
     if (location.pathname === path) {
       // Scroll within the current page
       const section = document.getElementById(sectionId);
@@ -51,9 +155,6 @@ const Header = ({ isUserLogged, onLogout }) => {
       navigate(`${path}#${sectionId}`);
     }
   };
-  // State to toggle navigation and user menu
-  const [showNav, setShowNav] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Toggle nav menu
   const toggleNav = () => {
@@ -68,7 +169,7 @@ const Header = ({ isUserLogged, onLogout }) => {
   };
 
   // Close menus when clicking outside
-  const closeMenus = (e) => {
+  const closeMenus = useCallback((e) => {
     if (
       !e.target.closest(".fa-bars") &&
       !e.target.closest(".fa-user") &&
@@ -78,17 +179,28 @@ const Header = ({ isUserLogged, onLogout }) => {
       setShowNav(false);
       setShowUserMenu(false);
     }
-  };
+  }, []);
+
+  const closeUserMenus = useCallback((e) => {
+    if (
+      !e.target.closest(".fa-user") &&
+      !e.target.closest(".fa-circle-user") &&
+      !e.target.closest(".user-control")
+    ) {
+      setIsMenuOpen(false);
+    }
+  }, []);
 
   // Add event listener to close menus on click outside
-  React.useEffect(() => {
+  useEffect(() => {
     document.addEventListener("click", closeMenus);
-    return () => document.removeEventListener("click", closeMenus);
-  }, []);
-  React.useEffect(() => {
     document.addEventListener("click", closeUserMenus);
-    return () => document.removeEventListener("click", closeMenus);
-  }, []);
+    
+    return () => {
+      document.removeEventListener("click", closeMenus);
+      document.removeEventListener("click", closeUserMenus);
+    };
+  }, [closeMenus, closeUserMenus]);
 
   useEffect(() => {
     // Select all sections and nav links
@@ -96,6 +208,7 @@ const Header = ({ isUserLogged, onLogout }) => {
       "main  > section:not(:nth-child(4))"
     );
     const navLinks = document.querySelectorAll(".navbar .link a");
+    
     // Function to remove 'active' class from all nav links
     const removeActiveClasses = () => {
       navLinks.forEach((link) => link.classList.remove("active"));
@@ -139,75 +252,96 @@ const Header = ({ isUserLogged, onLogout }) => {
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  });
+  }, []);
+
   const handlelogout = async () => {
     // sending token  to api endpoint
     try {
-      const response = await fetch("https://gadetguru.mgheit.com/api/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token?.token} `,
-        },
-      });
-      console.log(response);
+      const token = userInfo?.token;
+      if (token) {
+        const response = await fetch("https://gadetguru.mgheit.com/api/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      if (!response.ok) {
-        throw new Error("Logout failed.");
+        if (!response.ok) {
+          throw new Error("Logout failed.");
+        }
+        const result = await response.json();
+        console.log("Success:", result);
       }
-      const result = await response.json();
-      console.log("Success:", result);
 
-      // set the user login status to false
-      setUserInfo({
+      // Clear user data
+      const resetUserInfo = {
         token: "",
         isUserLoggedIn: false,
-      }); // redirect to login page
-      setMyuser({
-        ...myuser,
-        is_verified: false,
-        token: "",
-      });
+      };
+      
+      setUserInfo(resetUserInfo);
+      setMyuser({});
+      localStorage.setItem("userInfo", JSON.stringify(resetUserInfo));
+      
       onLogout();
       navigate("/login");
     } catch (error) {
-      console.error(error);
+      console.error("Logout error:", error);
+      // Even if API call fails, clear local data
+      const resetUserInfo = {
+        token: "",
+        isUserLoggedIn: false,
+      };
+      setUserInfo(resetUserInfo);
+      setMyuser({});
+      localStorage.setItem("userInfo", JSON.stringify(resetUserInfo));
+      onLogout();
+      navigate("/login");
     }
   };
-  useEffect(() => {
-    if (userInfo) {
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));
-    }
-  }, [userInfo]);
+
   const handleUserMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  const closeUserMenus = (e) => {
-    if (
-      !e.target.closest(".fa-user") &&
-      !e.target.closest(".fa-circle-user") &&
-      !e.target.closest(".user-control")
-    ) {
-      setIsMenuOpen(false);
-    }
-  };
+
   const handleDarkMode = () => {
     if (darkRef.current.checked) {
       setIsDark(true);
       document.body.classList.add("dark");
+      localStorage.setItem("darkMode", "true");
     } else {
       document.body.classList.remove("dark");
       setIsDark(false);
+      localStorage.setItem("darkMode", "false");
     }
   };
-  if (myuser?.is_verified || isUserLogged) {
+
+  // Load dark mode preference on mount
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem("darkMode");
+    if (savedDarkMode === "true") {
+      setIsDark(true);
+      document.body.classList.add("dark");
+      if (darkRef.current) {
+        darkRef.current.checked = true;
+      }
+    }
+  }, []);
+
+  // Check if user is logged in using both props and userInfo state
+  const isLoggedIn = isUserLogged || (userInfo?.isUserLoggedIn && userInfo?.token);
+
+  if (isLoggedIn) {
     return (
-      <header className="header">
+      <header className="header" ref={headerRef}>
         <div className="container">
           {/* Logo */}
           <div className="logo">
-            <img src={logo} alt="logo" className="logo" />
+            <Link to="/home">
+              <img src={logo} alt="Gadget Guru Logo" className="logo" />
+            </Link>
           </div>
 
           {/* Navbar */}
@@ -266,18 +400,17 @@ const Header = ({ isUserLogged, onLogout }) => {
                 </Link>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </a>
-              {/* <input type="text" name="search" id="search" placeholder="search" /> */}
             </div>
           </nav>
 
           {/* User Actions */}
           <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
             <ul className="user-actions">
-              <Link className="icon icon-1 sp" to={"/logic"}>
+              <Link className="icon icon-1 sp" to={"/logic"} title="Karnaugh Map Tool">
                 <Cpu size={32}/>
               </Link>
               <li className="icon icon-1 dropdown">
-                <i class="fa-solid fa-circle-user" onClick={handleUserMenu}></i>
+                <i className="fa-solid fa-circle-user" onClick={handleUserMenu}></i>
                 {/* user control  */}
                 <div
                   className={`user-control ${
@@ -286,7 +419,7 @@ const Header = ({ isUserLogged, onLogout }) => {
                 >
                   <div className="username">
                     <div className="icon">
-                      <i class="fa-solid fa-circle-user"></i>
+                      <i className="fa-solid fa-circle-user"></i>
                     </div>
                     <div className="user-detailes">
                       <span className="name">
@@ -300,23 +433,23 @@ const Header = ({ isUserLogged, onLogout }) => {
                   <ul className="items">
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-solid fa-user-large"></i>
+                        <i className="fa-solid fa-user-large"></i>
                       </div>
                       <Link className="uc-link" to="/profile">
-                        account
+                        Account
                       </Link>
                     </li>
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-solid fa-bookmark"></i>
+                        <i className="fa-solid fa-bookmark"></i>
                       </div>
                       <Link className="uc-link" to="/saved">
-                        saved ICs
+                        Saved ICs
                       </Link>
                     </li>
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-solid fa-star"></i>
+                        <i className="fa-solid fa-star"></i>
                       </div>
                       <Link className="uc-link" to="/popular">
                         Popular ICs
@@ -327,15 +460,15 @@ const Header = ({ isUserLogged, onLogout }) => {
                         <Cpu size={24}/>
                       </div>
                       <Link className="uc-link" to="/logic">
-                        Karnough map 
+                        Karnaugh Map 
                       </Link>
                     </li>
                     <li className="item">
                       <div className="icon-2">
-                        <i class="fa-solid fa-circle-question"></i>
+                        <i className="fa-solid fa-circle-question"></i>
                       </div>
                       <Link className="uc-link" to="/tersms-and-conditions">
-                        help center{" "}
+                        Help Center
                       </Link>
                     </li>
                   </ul>
@@ -343,12 +476,12 @@ const Header = ({ isUserLogged, onLogout }) => {
                     <div className="info">
                       <div className="icon-2">
                         <i
-                          class={`${
+                          className={`${
                             isDark ? "fa-solid fa-moon" : "fa-solid fa-sun "
                           }`}
                         ></i>
                       </div>
-                       &nbsp;  dark mode
+                       &nbsp;  Dark Mode
                     </div>
                     <label className="switch">
                       <input
@@ -361,17 +494,17 @@ const Header = ({ isUserLogged, onLogout }) => {
                   </div>
                   <div className="log-out" onClick={handlelogout}>
                     <div className="icon-2">
-                      <i class="fa-solid fa-right-from-bracket"></i>
+                      <i className="fa-solid fa-right-from-bracket"></i>
                     </div>
-                    log out
+                    Log Out
                   </div>
                 </div>
               </li>
-              <span>{myuser?.first_name || "username"}</span>
+              <span>{myuser?.first_name || "User"}</span>
             </ul>
           </div>
 
-          {/* Icons */}
+          {/* Mobile Icons */}
           <i className="fa fa-user" onClick={toggleUserMenu}></i>
           <i className="fa fa-bars" onClick={toggleNav}></i>
         </div>
@@ -379,93 +512,92 @@ const Header = ({ isUserLogged, onLogout }) => {
     );
   } else {
     return (
-      <>
-        <header className="header">
-          <div className="container">
-            {/* Logo */}
-            <div className="logo">
-              <img src={logo} alt="logo" className="logo" />
-            </div>
+      <header className="header" ref={headerRef}>
+        <div className="container">
+          {/* Logo */}
+          <div className="logo">
+            <Link to="/home">
+              <img src={logo} alt="Gadget Guru Logo" className="logo" />
+            </Link>
+          </div>
 
-            {/* Navbar */}
-            <nav className="navbar">
-              <ul
-                className={`nav-links ${showNav ? "show" : ""}`}
-                id="navLinks"
-              >
-                <li className="link">
-                  <a
-                    className="active"
-                    onClick={() => handleNavigation("/home", "home-Section")}
-                    name="home-Section"
-                  >
-                    Home
-                  </a>
-                </li>
-                <li className="link">
-                  <a
-                    onClick={() => handleNavigation("/home", "about-us")}
-                    name="about-us"
-                  >
-                    About US
-                  </a>
-                </li>
-                <li className="link">
-                  <a
-                    onClick={() => handleNavigation("/home", "ic-id")}
-                    name="ic-id"
-                  >
-                    Services
-                  </a>
-                </li>
-                <li className="link">
-                  <a
-                    onClick={() => handleNavigation("/home", "contactUS")}
-                    name="contactUS"
-                  >
-                    Contact Us
-                  </a>
-                </li>
-              </ul>
-
-              {/* Search */}
-              <div className="search">
+          {/* Navbar */}
+          <nav className="navbar">
+            <ul
+              className={`nav-links ${showNav ? "show" : ""}`}
+              id="navLinks"
+            >
+              <li className="link">
+                <a
+                  className="active"
+                  onClick={() => handleNavigation("/home", "home-Section")}
+                  name="home-Section"
+                >
+                  Home
+                </a>
+              </li>
+              <li className="link">
+                <a
+                  onClick={() => handleNavigation("/home", "about-us")}
+                  name="about-us"
+                >
+                  About US
+                </a>
+              </li>
+              <li className="link">
                 <a
                   onClick={() => handleNavigation("/home", "ic-id")}
                   name="ic-id"
                 >
-                  <Link
-                    to={{ hash: "#searching" }}
-                    style={{
-                      padding: "0",
-                      border: "none",
-                      textDecoration: "none",
-                    }}
-                  >
-                    search
-                  </Link>
-                  <i className="fa-solid fa-magnifying-glass"></i>
+                  Services
                 </a>
-                {/* <input type="text" name="search" id="search" placeholder="search" /> */}
-              </div>
-            </nav>
+              </li>
+              <li className="link">
+                <a
+                  onClick={() => handleNavigation("/home", "contactUS")}
+                  name="contactUS"
+                >
+                  Contact Us
+                </a>
+              </li>
+            </ul>
 
-            {/* User Actions */}
-            <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
-              <Link to="/login" className="signin" id="signIn">
-                Sign In
-              </Link>
-              <Link to="/register" className="register" id="Reg">
-                Sign Up
-              </Link>
+            {/* Search */}
+            <div className="search">
+              <a
+                onClick={() => handleNavigation("/home", "ic-id")}
+                name="ic-id"
+              >
+                <Link
+                  to={{ hash: "#searching" }}
+                  style={{
+                    padding: "0",
+                    border: "none",
+                    textDecoration: "none",
+                  }}
+                >
+                  search
+                </Link>
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </a>
             </div>
+          </nav>
 
-            {/* Icons */}
-            <i className="fa fa-user" onClick={toggleUserMenu}></i>
-            <i className="fa fa-bars" onClick={toggleNav}></i>
+          {/* User Actions */}
+          <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
+            <Link to="/login" className="signin" id="signIn">
+              Sign In
+            </Link>
+            <Link to="/register" className="register" id="Reg">
+              Sign Up
+            </Link>
           </div>
-        </header>{" "}
-      </>
+
+          {/* Mobile Icons */}
+          <i className="fa fa-user" onClick={toggleUserMenu}></i>
+          <i className="fa fa-bars" onClick={toggleNav}></i>
+        </div>
+      </header>
     );
   }
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import MapPicker from "../components/map";
 import {
@@ -27,19 +27,31 @@ function Profile() {
     first_name: "",
     last_name: "",
     email: "",
-    phone: "+20",
+    phone: "",
     country: "Egypt",
     language: "English",
   });
 
-  const [userInfo, setUserInfo] = useState({
-    token: JSON.parse(localStorage.getItem("userInfo"))?.token,
-    isUserLoggedIn: JSON.parse(localStorage.getItem("userInfo"))
-      ?.isUserLoggedIn,
+  // Get userInfo from localStorage consistently
+  const [userInfo, setUserInfo] = useState(() => {
+    try {
+      const stored = localStorage.getItem("userInfo");
+      return stored ? JSON.parse(stored) : { token: "", isUserLoggedIn: false };
+    } catch (error) {
+      console.error("Error parsing userInfo:", error);
+      return { token: "", isUserLoggedIn: false };
+    }
   });
 
-  const getUserInfo = async () => {
-    if (userInfo.isUserLoggedIn) {
+  const [passwords, setPasswords] = useState({
+    current: "",
+    new: "",
+    confirm: "",
+  });
+
+  // Memoize getUserInfo to prevent unnecessary re-renders
+  const getUserInfo = useCallback(async () => {
+    if (userInfo?.isUserLoggedIn && userInfo?.token) {
       try {
         const response = await axios.get(
           "https://gadetguru.mgheit.com/api/profile",
@@ -51,32 +63,80 @@ function Profile() {
           }
         );
         const result = response.data.data;
-
-        setProfile({
-          ...result,
-          country: "Egypt",
-          language: "English",
+        console.log("Profile data fetched successfully:", result);
+        setProfile(prevProfile => {
+          const newProfile = {
+            ...result,
+            country: result.country || "Egypt",
+            language: result.language || "English",
+            phone: result.phone ?? "", // <--- add this line
+          };
+          
+          // Only update if the data has actually changed
+          if (JSON.stringify(prevProfile) !== JSON.stringify(newProfile)) {
+            return newProfile;
+          }
+          return prevProfile;
         });
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching profile:", error);
+        if (error.response?.status === 401) {
+          // Token is invalid, redirect to login
+          localStorage.removeItem("userInfo");
+          window.location.href = "/login";
+        }
       }
     }
-  };
+  }, [userInfo?.token, userInfo?.isUserLoggedIn]);
 
+  // Update userInfo when localStorage changes
   useEffect(() => {
-    getUserInfo();
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem("userInfo");
+        if (stored) {
+          const parsedUserInfo = JSON.parse(stored);
+          // Only update if the data has actually changed
+          if (parsedUserInfo.token !== userInfo.token || 
+              parsedUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn) {
+            setUserInfo(parsedUserInfo);
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing userInfo from storage:", error);
+      }
+    };
+
+    // Listen for storage changes
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Check on component mount
+    handleStorageChange();
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
-  const [passwords, setPasswords] = useState({
-    current: "",
-    new: "",
-    confirm: "",
-  });
+
+  // Call getUserInfo when userInfo changes, but with debouncing
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      getUserInfo();
+    }, 100); // Small delay to prevent rapid calls
+
+    return () => clearTimeout(timeoutId);
+  }, [getUserInfo]);
 
   const handlePasswordVisibility = (field) => {
     setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   const saveProfileChanges = async () => {
+    if (!userInfo?.token) {
+      setError("Authentication token missing. Please login again.");
+      return;
+    }
+
     const form = new FormData();
     const payLoad = {
       first_name: profile.first_name,
@@ -88,7 +148,9 @@ function Profile() {
     };
 
     Object.keys(payLoad).forEach((key) => {
-      form.append(key, payLoad[key]);
+      if (payLoad[key] !== undefined && payLoad[key] !== null) {
+        form.append(key, payLoad[key]);
+      }
     });
 
     try {
@@ -105,8 +167,16 @@ function Profile() {
 
       console.log("Profile updated successfully");
       setIsEditMode(false);
+      setError("");
     } catch (error) {
       console.error("Error updating profile:", error);
+      if (error.response?.status === 401) {
+        setError("Session expired. Please login again.");
+        localStorage.removeItem("userInfo");
+        window.location.href = "/login";
+      } else {
+        setError("Failed to update profile. Please try again.");
+      }
     }
   };
 
@@ -156,11 +226,31 @@ function Profile() {
           }
         );
         setIsPasswordMode(false);
+        setError("");
       } catch (error) {
-        console.error(error);
+        console.error("Password change error:", error);
+        setError("Failed to change password. Please try again.");
       }
     }
   };
+
+  // Check if user is logged in
+  if (!userInfo?.isUserLoggedIn || !userInfo?.token) {
+    return (
+      <div className="manin-section">
+        <div className="container">
+          <div className="content">
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <h2>Please login to access your profile</h2>
+              <a href="/login" style={{ color: '#007aff', textDecoration: 'none' }}>
+                Go to Login
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isPasswordMode) {
     return (
@@ -199,7 +289,7 @@ function Profile() {
                 </div>
                 <div className="form-section">
                   <h3 className="section-title">Change Password</h3>{" "}
-                  <span style={{ color: "#e34152" }}>{error}</span>
+                  {error && <span style={{ color: "#e34152" }}>{error}</span>}
                   {["current", "new", "confirm"].map((field) => (
                     <div className="form-group" key={field}>
                       <label className="form-label">
@@ -294,6 +384,12 @@ function Profile() {
                 </div>
               </div>
 
+              {error && (
+                <div style={{ color: "#e34152", marginBottom: "1rem" }}>
+                  {error}
+                </div>
+              )}
+
               <div className="form-section">
                 <h3 className="section-title">Full Name</h3>
                 <div className="form-grid">
@@ -361,7 +457,10 @@ function Profile() {
                         type="tel"
                         disabled={!isEditMode}
                         className="form-input"
-                        value={profile.phone}
+                        maxLength={11}
+                        
+                        value={profile.phone }
+                        placeholder="e.g. +20 1234567890"
                         onChange={(e) =>
                           setProfile((prev) => ({
                             ...prev,
@@ -436,13 +535,6 @@ function Profile() {
                           longitude: lng,
                         }))
                       }
-                         onChange={(e) =>
-                          setProfile((prev) => ({
-                            ...prev,
-                            latitude: e.target.value,
-                            longitude: e.target.value,
-                          }))
-                        } 
                     />
                   </div>
                 </div>
