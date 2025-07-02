@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo-1.png";
 import "../styles/models.css"; // Assuming your CSS file for styling
@@ -28,32 +28,8 @@ const Header = ({ isUserLogged, onLogout }) => {
   const [showNav, setShowNav] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  // Update userInfo when localStorage changes (for social login)
-  useEffect(() => {
-    const handleStorageChange = () => {
-      try {
-        const stored = localStorage.getItem("userInfo");
-        if (stored) {
-          const parsedUserInfo = JSON.parse(stored);
-          setUserInfo(parsedUserInfo);
-        }
-      } catch (error) {
-        console.error("Error parsing userInfo from storage:", error);
-      }
-    };
-
-    // Listen for storage changes
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Also check on component mount and when isUserLogged changes
-    handleStorageChange();
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [isUserLogged]);
-
-  const getUserInfo = async () => {
+  // Memoize getUserInfo to prevent unnecessary re-renders
+  const getUserInfo = useCallback(async () => {
     // Use the current userInfo state instead of localStorage directly
     if ((userInfo?.isUserLoggedIn && userInfo?.token) || isUserLogged) {
       try {
@@ -71,7 +47,13 @@ const Header = ({ isUserLogged, onLogout }) => {
         });
         
         const result = response.data.data;
-        setMyuser(result);
+        setMyuser(prevUser => {
+          // Only update if the data has actually changed
+          if (JSON.stringify(prevUser) !== JSON.stringify(result)) {
+            return result;
+          }
+          return prevUser;
+        });
       } catch (error) {
         console.error("Error fetching user profile:", error);
         // If token is invalid, logout the user
@@ -80,11 +62,45 @@ const Header = ({ isUserLogged, onLogout }) => {
         }
       }
     }
-  };
+  }, [userInfo?.token, userInfo?.isUserLoggedIn, isUserLogged]);
 
+  // Update userInfo when localStorage changes (for social login) - but prevent loops
   useEffect(() => {
-    getUserInfo();
-  }, [userInfo, isUserLogged]);
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem("userInfo");
+        if (stored) {
+          const parsedUserInfo = JSON.parse(stored);
+          // Only update if the data has actually changed
+          if (parsedUserInfo.token !== userInfo.token || 
+              parsedUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn) {
+            setUserInfo(parsedUserInfo);
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing userInfo from storage:", error);
+      }
+    };
+
+    // Listen for storage changes
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Check on component mount only
+    handleStorageChange();
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []); // Empty dependency array to run only once
+
+  // Call getUserInfo when userInfo or isUserLogged changes, but with debouncing
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      getUserInfo();
+    }, 100); // Small delay to prevent rapid calls
+
+    return () => clearTimeout(timeoutId);
+  }, [getUserInfo]);
 
   const handleNavigation = (path, sectionId) => {
     if (location.pathname === path) {
@@ -124,15 +140,25 @@ const Header = ({ isUserLogged, onLogout }) => {
     }
   };
 
+  const closeUserMenus = (e) => {
+    if (
+      !e.target.closest(".fa-user") &&
+      !e.target.closest(".fa-circle-user") &&
+      !e.target.closest(".user-control")
+    ) {
+      setIsMenuOpen(false);
+    }
+  };
+
   // Add event listener to close menus on click outside
   React.useEffect(() => {
     document.addEventListener("click", closeMenus);
-    return () => document.removeEventListener("click", closeMenus);
-  }, []);
-
-  React.useEffect(() => {
     document.addEventListener("click", closeUserMenus);
-    return () => document.removeEventListener("click", closeUserMenus);
+    
+    return () => {
+      document.removeEventListener("click", closeMenus);
+      document.removeEventListener("click", closeUserMenus);
+    };
   }, []);
 
   useEffect(() => {
@@ -184,7 +210,7 @@ const Header = ({ isUserLogged, onLogout }) => {
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  });
+  }, []);
 
   const handlelogout = async () => {
     // sending token  to api endpoint
@@ -199,7 +225,6 @@ const Header = ({ isUserLogged, onLogout }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response);
 
         if (!response.ok) {
           throw new Error("Logout failed.");
@@ -237,16 +262,6 @@ const Header = ({ isUserLogged, onLogout }) => {
 
   const handleUserMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const closeUserMenus = (e) => {
-    if (
-      !e.target.closest(".fa-user") &&
-      !e.target.closest(".fa-circle-user") &&
-      !e.target.closest(".user-control")
-    ) {
-      setIsMenuOpen(false);
-    }
   };
 
   const handleDarkMode = () => {

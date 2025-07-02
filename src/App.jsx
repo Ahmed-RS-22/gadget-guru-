@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {  Routes, Route, Navigate ,HashRouter} from "react-router-dom";
 import Header from "./components/header";
 import IcInfo from "./pages/ic";
@@ -41,33 +41,54 @@ function App() {
 
   const [isUserLogged, setIsUserLogged] = useState(userInfo?.isUserLoggedIn || false);
 
-  // Update localStorage whenever userInfo changes
+  // Update localStorage whenever userInfo changes - but prevent infinite loops
   useEffect(() => {
     try {
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));
-      setIsUserLogged(userInfo.isUserLoggedIn);
+      const currentStored = localStorage.getItem("userInfo");
+      const newUserInfoString = JSON.stringify(userInfo);
+      
+      // Only update if the data has actually changed
+      if (currentStored !== newUserInfoString) {
+        localStorage.setItem("userInfo", newUserInfoString);
+      }
+      
+      // Update isUserLogged state only if it's different
+      if (isUserLogged !== userInfo.isUserLoggedIn) {
+        setIsUserLogged(userInfo.isUserLoggedIn);
+      }
     } catch (error) {
       console.error("Error saving userInfo to localStorage:", error);
     }
-  }, [userInfo]);
+  }, [userInfo]); // Remove isUserLogged from dependencies to prevent loop
 
-  const handleLogin = () => {
-    // Get the latest userInfo from localStorage in case it was updated by social login
+  // Memoize the login handler to prevent unnecessary re-renders
+  const handleLogin = useCallback(() => {
     try {
       const latestUserInfo = JSON.parse(localStorage.getItem("userInfo"));
-      if (latestUserInfo && latestUserInfo.isUserLoggedIn) {
-        setUserInfo(latestUserInfo);
-        setIsUserLogged(true);
+      if (latestUserInfo && latestUserInfo.isUserLoggedIn && latestUserInfo.token) {
+        // Only update state if it's actually different
+        if (latestUserInfo.token !== userInfo.token || 
+            latestUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn) {
+          setUserInfo(latestUserInfo);
+        }
+        if (!isUserLogged) {
+          setIsUserLogged(true);
+        }
       } else {
-        setIsUserLogged(true);
+        if (!isUserLogged) {
+          setIsUserLogged(true);
+        }
       }
     } catch (error) {
       console.error("Error reading userInfo during login:", error);
-      setIsUserLogged(true);
+      if (!isUserLogged) {
+        setIsUserLogged(true);
+      }
     }
-  };
+  }, [userInfo.token, userInfo.isUserLoggedIn, isUserLogged]);
 
-  const handleLogout = () => {
+  // Memoize the logout handler
+  const handleLogout = useCallback(() => {
     const resetUserInfo = {
       token: "",
       isUserLoggedIn: false,
@@ -75,7 +96,7 @@ function App() {
     setUserInfo(resetUserInfo);
     setIsUserLogged(false);
     localStorage.setItem("userInfo", JSON.stringify(resetUserInfo));
-  };
+  }, []);
 
   return (
     <HashRouter basename="/"> 

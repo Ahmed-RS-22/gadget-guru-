@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import MapPicker from "../components/map";
 import {
@@ -43,7 +43,14 @@ function Profile() {
     }
   });
 
-  const getUserInfo = async () => {
+  const [passwords, setPasswords] = useState({
+    current: "",
+    new: "",
+    confirm: "",
+  });
+
+  // Memoize getUserInfo to prevent unnecessary re-renders
+  const getUserInfo = useCallback(async () => {
     if (userInfo?.isUserLoggedIn && userInfo?.token) {
       try {
         const response = await axios.get(
@@ -57,10 +64,18 @@ function Profile() {
         );
         const result = response.data.data;
 
-        setProfile({
-          ...result,
-          country: result.country || "Egypt",
-          language: result.language || "English",
+        setProfile(prevProfile => {
+          const newProfile = {
+            ...result,
+            country: result.country || "Egypt",
+            language: result.language || "English",
+          };
+          
+          // Only update if the data has actually changed
+          if (JSON.stringify(prevProfile) !== JSON.stringify(newProfile)) {
+            return newProfile;
+          }
+          return prevProfile;
         });
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -71,17 +86,45 @@ function Profile() {
         }
       }
     }
-  };
+  }, [userInfo?.token, userInfo?.isUserLoggedIn]);
 
+  // Update userInfo when localStorage changes
   useEffect(() => {
-    getUserInfo();
-  }, [userInfo]);
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem("userInfo");
+        if (stored) {
+          const parsedUserInfo = JSON.parse(stored);
+          // Only update if the data has actually changed
+          if (parsedUserInfo.token !== userInfo.token || 
+              parsedUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn) {
+            setUserInfo(parsedUserInfo);
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing userInfo from storage:", error);
+      }
+    };
 
-  const [passwords, setPasswords] = useState({
-    current: "",
-    new: "",
-    confirm: "",
-  });
+    // Listen for storage changes
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Check on component mount
+    handleStorageChange();
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  // Call getUserInfo when userInfo changes, but with debouncing
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      getUserInfo();
+    }, 100); // Small delay to prevent rapid calls
+
+    return () => clearTimeout(timeoutId);
+  }, [getUserInfo]);
 
   const handlePasswordVisibility = (field) => {
     setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
