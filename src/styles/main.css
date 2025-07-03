@@ -562,14 +562,17 @@ ul {
   font-size: clamp(1.5rem, 3dvw, 2rem);
   opacity: 0;
   animation: fadeInUp 0.8s ease-out 1s forwards;
+  color: var(--dark-font-color);
 }
 .about-us .container .sec2 .content .description {
   font-size: clamp(0.9rem, 1.2dvw, 1.1rem);
   font-weight: 600;
   opacity: 0;
   animation: fadeInUp 0.8s ease-out 1.2s forwards;
+  color: var(--dark-font-color);
 }
 .about-us .container .sec2 .content h3 {
+  color: var(--dark-font-color);
   font-size: clamp(1.1rem, 2dvw, 1.6rem);
   opacity: 0;
   animation: fadeInUp 0.8s ease-out 1.4s forwards;
