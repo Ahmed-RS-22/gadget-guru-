@@ -335,48 +335,45 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
 
   if (isLoggedIn) {
     return (
-      <header className="header animate-fadeInDown" ref={headerRef}>
+      <header className="header" ref={headerRef}>
         <div className="container">
           {/* Logo */}
-          <div className="logo animate-scaleIn animate-delay-200">
+          <div className="logo">
             <Link to="/home">
-              <img src={logo} alt="Gadget Guru Logo" className="logo hover-rotate" />
+              <img src={logo} alt="Gadget Guru Logo" className="logo" />
             </Link>
           </div>
 
           {/* Navbar */}
           <nav className="navbar">
             <ul className={`nav-links ${showNav ? "show" : ""}`} id="navLinks">
-              <li className="link animate-slideInLeft animate-delay-300">
+              <li className="link">
                 <a
-                  className="active hover-glow"
+                  className="active"
                   onClick={() => handleNavigation("/home", "home-Section")}
                   name="home-Section"
                 >
                   Home
                 </a>
               </li>
-              <li className="link animate-slideInLeft animate-delay-400">
+              <li className="link">
                 <a
-                  className="hover-glow"
                   onClick={() => handleNavigation("/home", "about-us")}
                   name="about-us"
                 >
                   About US
                 </a>
               </li>
-              <li className="link animate-slideInLeft animate-delay-500">
+              <li className="link">
                 <a
-                  className="hover-glow"
                   onClick={() => handleNavigation("/home", "ic-id")}
                   name="ic-id"
                 >
                   Services
                 </a>
               </li>
-              <li className="link animate-slideInLeft animate-delay-600">
+              <li className="link">
                 <a
-                  className="hover-glow"
                   onClick={() => handleNavigation("/home", "contactUS")}
                   name="contactUS"
                 >
@@ -386,9 +383,8 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
             </ul>
 
             {/* Search */}
-            <div className="search animate-scaleIn animate-delay-700">
+            <div className="search">
               <a
-                className="hover-lift"
                 onClick={() => handleNavigation("/home", "ic-id")}
                 name="ic-id"
               >
@@ -402,7 +398,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                 >
                   search
                 </Link>
-                <i className="fa-solid fa-magnifying-glass animate-wiggle"></i>
+                <i className="fa-solid fa-magnifying-glass"></i>
               </a>
             </div>
           </nav>
@@ -410,20 +406,20 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
           {/* User Actions */}
           <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
             <ul className="user-actions">
-              <Link className="icon icon-1 sp hover-glow animate-pulse" to={"/logic"} title="Karnaugh Map Tool">
+              <Link className="icon icon-1 sp" to={"/logic"} title="Karnaugh Map Tool">
                 <Cpu size={32}/>
               </Link>
-              <li className="icon icon-1 dropdown animate-scaleIn animate-delay-800">
-                <i className="fa-solid fa-circle-user hover-scale" onClick={handleUserMenu}></i>
+              <li className="icon icon-1 dropdown">
+                <i className="fa-solid fa-circle-user" onClick={handleUserMenu}></i>
                 {/* user control  */}
                 <div
                   className={`user-control ${
-                    isMenuOpen ? "user-control shown animate-fadeInDown" : "user-control"
+                    isMenuOpen ? "user-control shown" : "user-control"
                   }`}
                 >
-                  <div className="username animate-slideInLeft">
+                  <div className="username">
                     <div className="icon">
-                      <i className="fa-solid fa-circle-user animate-pulse"></i>
+                      <i className="fa-solid fa-circle-user"></i>
                     </div>
                     <div className="user-detailes">
                       <span className="name">
@@ -435,7 +431,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                     </div>
                   </div>
                   <ul className="items">
-                    <li className="item hover-lift animate-slideInLeft animate-delay-100">
+                    <li className="item">
                       <div className="icon-2">
                         <i className="fa-solid fa-user-large"></i>
                       </div>
@@ -443,7 +439,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                         Account
                       </Link>
                     </li>
-                    <li className="item hover-lift animate-slideInLeft animate-delay-200">
+                    <li className="item">
                       <div className="icon-2">
                         <i className="fa-solid fa-bookmark"></i>
                       </div>
@@ -451,7 +447,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                         Saved ICs
                       </Link>
                     </li>
-                    <li className="item hover-lift animate-slideInLeft animate-delay-300">
+                    <li className="item">
                       <div className="icon-2">
                         <i className="fa-solid fa-star"></i>
                       </div>
@@ -459,7 +455,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                         Popular ICs
                       </Link>
                     </li>
-                    <li className="item hover-lift animate-slideInLeft animate-delay-400">
+                    <li className="item">
                       <div className="icon-2">
                         <Cpu size={24}/>
                       </div>
@@ -467,7 +463,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                         Karnaugh Map 
                       </Link>
                     </li>
-                    <li className="item hover-lift animate-slideInLeft animate-delay-500">
+                    <li className="item">
                       <div className="icon-2">
                         <i className="fa-solid fa-circle-question"></i>
                       </div>
@@ -476,7 +472,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                       </Link>
                     </li>
                   </ul>
-                  <div className="dark-mode animate-slideInLeft animate-delay-600">
+                  <div className="dark-mode">
                     <div className="info">
                       <div className="icon-2">
                         <i
@@ -496,7 +492,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                       <span className="slider round"></span>
                     </label>
                   </div>
-                  <div className="log-out hover-lift animate-slideInLeft animate-delay-700" onClick={handlelogout}>
+                  <div className="log-out" onClick={handlelogout}>
                     <div className="icon-2">
                       <i className="fa-solid fa-right-from-bracket"></i>
                     </div>
@@ -504,24 +500,24 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                   </div>
                 </div>
               </li>
-              <span className="animate-fadeInRight animate-delay-900">{myuser?.first_name || "User"}</span>
+              <span>{myuser?.first_name || "User"}</span>
             </ul>
           </div>
 
           {/* Mobile Icons */}
-          <i className="fa fa-user hover-scale animate-bounce" onClick={toggleUserMenu}></i>
-          <i className="fa fa-bars hover-scale animate-wiggle" onClick={toggleNav}></i>
+          <i className="fa fa-user" onClick={toggleUserMenu}></i>
+          <i className="fa fa-bars" onClick={toggleNav}></i>
         </div>
       </header>
     );
   } else {
     return (
-      <header className="header animate-fadeInDown" ref={headerRef}>
+      <header className="header" ref={headerRef}>
         <div className="container">
           {/* Logo */}
-          <div className="logo animate-scaleIn animate-delay-200">
+          <div className="logo">
             <Link to="/home">
-              <img src={logo} alt="Gadget Guru Logo" className="logo hover-rotate" />
+              <img src={logo} alt="Gadget Guru Logo" className="logo" />
             </Link>
           </div>
 
@@ -531,36 +527,33 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
               className={`nav-links ${showNav ? "show" : ""}`}
               id="navLinks"
             >
-              <li className="link animate-slideInLeft animate-delay-300">
+              <li className="link">
                 <a
-                  className="active hover-glow"
+                  className="active"
                   onClick={() => handleNavigation("/home", "home-Section")}
                   name="home-Section"
                 >
                   Home
                 </a>
               </li>
-              <li className="link animate-slideInLeft animate-delay-400">
+              <li className="link">
                 <a
-                  className="hover-glow"
                   onClick={() => handleNavigation("/home", "about-us")}
                   name="about-us"
                 >
                   About US
                 </a>
               </li>
-              <li className="link animate-slideInLeft animate-delay-500">
+              <li className="link">
                 <a
-                  className="hover-glow"
                   onClick={() => handleNavigation("/home", "ic-id")}
                   name="ic-id"
                 >
                   Services
                 </a>
               </li>
-              <li className="link animate-slideInLeft animate-delay-600">
+              <li className="link">
                 <a
-                  className="hover-glow"
                   onClick={() => handleNavigation("/home", "contactUS")}
                   name="contactUS"
                 >
@@ -570,9 +563,8 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
             </ul>
 
             {/* Search */}
-            <div className="search animate-scaleIn animate-delay-700">
+            <div className="search">
               <a
-                className="hover-lift"
                 onClick={() => handleNavigation("/home", "ic-id")}
                 name="ic-id"
               >
@@ -586,24 +578,24 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                 >
                   search
                 </Link>
-                <i className="fa-solid fa-magnifying-glass animate-wiggle"></i>
+                <i className="fa-solid fa-magnifying-glass"></i>
               </a>
             </div>
           </nav>
 
           {/* User Actions */}
           <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
-            <Link to="/login" className="signin hover-lift animate-slideInRight animate-delay-800" id="signIn">
+            <Link to="/login" className="signin" id="signIn">
               Sign In
             </Link>
-            <Link to="/register" className="register hover-lift animate-slideInRight animate-delay-900" id="Reg">
+            <Link to="/register" className="register" id="Reg">
               Sign Up
             </Link>
           </div>
 
           {/* Mobile Icons */}
-          <i className="fa fa-user hover-scale animate-bounce" onClick={toggleUserMenu}></i>
-          <i className="fa fa-bars hover-scale animate-wiggle" onClick={toggleNav}></i>
+          <i className="fa fa-user" onClick={toggleUserMenu}></i>
+          <i className="fa fa-bars" onClick={toggleNav}></i>
         </div>
       </header>
     );
