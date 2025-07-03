@@ -16,15 +16,8 @@ import { useNavigate } from "react-router-dom";
 
 function Profile() {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isPasswordMode, setIsPasswordMode] = useState(false);
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState({
-    current: false,
-    new: false,
-    confirm: false,
-  });
   const navigate = useNavigate();
-
   const [profile, setProfile] = useState({
     first_name: "",
     last_name: "",
@@ -33,8 +26,6 @@ function Profile() {
     country: "Egypt",
     language: "English",
   });
-
-  // Get userInfo from localStorage consistently
   const [userInfo, setUserInfo] = useState(() => {
     try {
       const stored = localStorage.getItem("userInfo");
@@ -44,13 +35,6 @@ function Profile() {
       return { token: "", isUserLoggedIn: false };
     }
   });
-
-  const [passwords, setPasswords] = useState({
-    current: "",
-    new: "",
-    confirm: "",
-  });
-
   // Memoize getUserInfo to prevent unnecessary re-renders
   const getUserInfo = useCallback(async () => {
     if (userInfo?.isUserLoggedIn && userInfo?.token) {
@@ -66,14 +50,14 @@ function Profile() {
         );
         const result = response.data.data;
         console.log("Profile data fetched successfully:", result);
-        setProfile(prevProfile => {
+        setProfile((prevProfile) => {
           const newProfile = {
             ...result,
             country: result.country || "Egypt",
             language: result.language || "English",
             phone: result.phone ?? "", // <--- add this line
           };
-          
+
           // Only update if the data has actually changed
           if (JSON.stringify(prevProfile) !== JSON.stringify(newProfile)) {
             return newProfile;
@@ -99,8 +83,10 @@ function Profile() {
         if (stored) {
           const parsedUserInfo = JSON.parse(stored);
           // Only update if the data has actually changed
-          if (parsedUserInfo.token !== userInfo.token || 
-              parsedUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn) {
+          if (
+            parsedUserInfo.token !== userInfo.token ||
+            parsedUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn
+          ) {
             setUserInfo(parsedUserInfo);
           }
         }
@@ -110,13 +96,13 @@ function Profile() {
     };
 
     // Listen for storage changes
-    window.addEventListener('storage', handleStorageChange);
-    
+    window.addEventListener("storage", handleStorageChange);
+
     // Check on component mount
     handleStorageChange();
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 
@@ -128,10 +114,6 @@ function Profile() {
 
     return () => clearTimeout(timeoutId);
   }, [getUserInfo]);
-
-  const handlePasswordVisibility = (field) => {
-    setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
-  };
 
   const saveProfileChanges = async () => {
     if (!userInfo?.token) {
@@ -181,64 +163,13 @@ function Profile() {
       }
     }
   };
-  const goToForgetPassword = ()=>{
-      navigate("/forget-password", {
-        state: {userEmail: profile.email},})
-    
-  }
+  const goToForgetPassword = () => {
+    navigate("/forget-password", {
+      state: { userEmail: profile.email },
+    });
+  };
   const handleSaveChanges = () => {
     saveProfileChanges();
-  };
-
-  const isValidPassword = (password) => {
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return passwordRegex.test(password);
-  };
-
-  const validate = () => {
-    if (!isValidPassword(passwords.new)) {
-      setError(
-        "Password must be at least 8 characters long and must contain at least one uppercase letter"
-      );
-      return false;
-    }
-    if (passwords.new === passwords.current) {
-      setError("Password cannot be the same as the current password");
-      return false;
-    }
-    if (passwords.new !== passwords.confirm) {
-      setError("Passwords do not match");
-      return false;
-    }
-    setError("");
-    return true;
-  };
-
-  const handlePasswordChange = async () => {
-    if (validate()) {
-      const formData = new FormData();
-      formData.append("email", profile.email);
-      formData.append("password", passwords.new);
-      formData.append("password_confirmation", passwords.confirm);
-      try {
-        const response = await axios.post(
-          "https://gadetguru.mgheit.com/api/reset-password",
-          formData,
-          {
-            headers: {
-              Accept: "application/json",
-            },
-          }
-        );
-        setIsPasswordMode(false);
-        setError("");
-        console.log("Password changed successfully:", response.data);
-      } catch (error) {
-        console.error("Password change error:", error);
-        setError("Failed to change password. Please try again.");
-      }
-    }
   };
 
   // Check if user is logged in
@@ -247,9 +178,12 @@ function Profile() {
       <div className="manin-section">
         <div className="container">
           <div className="content">
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <div style={{ textAlign: "center", padding: "2rem" }}>
               <h2>Please login to access your profile</h2>
-              <a href="/login" style={{ color: '#007aff', textDecoration: 'none' }}>
+              <a
+                href="/login"
+                style={{ color: "#007aff", textDecoration: "none" }}
+              >
                 Go to Login
               </a>
             </div>
@@ -258,85 +192,6 @@ function Profile() {
       </div>
     );
   }
-
-  // if (isPasswordMode) {
-  //   return (
-  //     <div className="manin-section">
-  //       <div className="container">
-  //         <div className="content">
-  //           <div className="card">
-  //             <div className="header-gradient" />
-  //             <div className="card-body">
-  //               <div className="profile-header">
-  //                 <div className="profile-info">
-  //                   <div className="avatar">
-  //                     <User />
-  //                   </div>
-  //                   <div className="user-details">
-  //                     <h2 className="user-name">
-  //                       {profile.first_name + " " + profile.last_name}
-  //                     </h2>
-  //                     <p className="user-email">{profile.email}</p>
-  //                   </div>
-  //                 </div>
-  //                 <div className="button-group">
-  //                   <button
-  //                     onClick={handlePasswordChange}
-  //                     className="button button-primary"
-  //                   >
-  //                     Save Changes
-  //                   </button>
-  //                   <button
-  //                     onClick={() => setIsPasswordMode(false)}
-  //                     className="button button-secondary"
-  //                   >
-  //                     Cancel
-  //                   </button>
-  //                 </div>
-  //               </div>
-  //               <div className="form-section">
-  //                 <h3 className="section-title">Change Password</h3>{" "}
-  //                 {error && <span style={{ color: "#e34152" }}>{error}</span>}
-  //                 {["current", "new", "confirm"].map((field) => (
-  //                   <div className="form-group" key={field}>
-  //                     <label className="form-label">
-  //                       {field === "confirm"
-  //                         ? "Confirm New Password"
-  //                         : field === "new"
-  //                         ? "New Password"
-  //                         : "Current Password"}
-  //                     </label>
-  //                     <div className="input-wrapper">
-  //                       <input
-  //                         type={showPassword[field] ? "text" : "password"}
-  //                         className="form-input password-input"
-  //                         onChange={(e) =>
-  //                           setPasswords((prev) => ({
-  //                             ...prev,
-  //                             [field]: e.target.value,
-  //                           }))
-  //                         }
-  //                       />
-  //                       <Lock className="input-icon" />
-  //                       <button
-  //                         type="button"
-  //                         onClick={() => handlePasswordVisibility(field)}
-  //                         className="password-toggle"
-  //                       >
-  //                         {showPassword[field] ? <EyeOff /> : <Eye />}
-  //                       </button>
-  //                     </div>
-  //                   </div>
-  //                 ))}
-  //               </div>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="manin-section">
       <div className="container">
@@ -429,7 +284,6 @@ function Profile() {
                         }))
                       }
                     />
-                  
                   </div>
                 </div>
               </div>
@@ -466,7 +320,7 @@ function Profile() {
                         disabled={!isEditMode}
                         className="form-input"
                         maxLength={11}
-                        value={profile.phone }
+                        value={profile.phone}
                         placeholder="e.g. +20 1234567890"
                         onChange={(e) =>
                           setProfile((prev) => ({
