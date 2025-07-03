@@ -634,6 +634,8 @@ ul {
   background-color: var(--white-color);
   opacity: 0;
   animation: fadeInUp 1s ease-out forwards;
+  position: relative;
+  z-index: 6;
 }
 .idintify .container {
   display: flex;
@@ -783,6 +785,7 @@ ul {
   opacity: 0;
   animation: scaleIn 1s ease-out 1.2s forwards;
   transition: all 0.3s ease;
+  z-index: 1000;
   
   &:hover {
     transform: translateY(-5px);
@@ -813,7 +816,7 @@ ul {
   flex-direction: column;
   gap: 5px;
   border-radius: 20px;
-  z-index: 999;
+  z-index: 1001;
   animation: slideInDown 0.3s ease-out;
 }
 .idintify .container .sec-2 .content .search .suggetions.show {
@@ -888,6 +891,7 @@ ul {
 .team {
   margin: 10px auto;
   position: relative;
+  z-index: 1;
   opacity: 0;
   animation: fadeInUp 1s ease-out forwards;
 }
@@ -896,6 +900,7 @@ ul {
   position: absolute;
   right: 0;
   top: 0px;
+  z-index: 1;
   width: 100px;
   aspect-ratio: 1/1;
   clip-path: polygon(0% 50%, 100% 100%, 100% 0);
@@ -903,6 +908,8 @@ ul {
 }
 .team .container {
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 .team .container .sec-title {
   min-height: 300px;
@@ -910,13 +917,25 @@ ul {
   width: 80dvw;
   margin: 60px auto 50px;
   border-radius: 20px;
+  animation: scaleIn2 1s ease-out 0.3s forwards;
+  transition: all 0.3s ease; 
   opacity: 0;
-  animation: scaleIn 1s ease-out 0.3s forwards;
-  transition: all 0.3s ease;
-  
+    z-index: 0;
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  }
+}
+@keyframes scaleIn2 {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+    z-index: 0;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    z-index: 5;
   }
 }
 .team .container .sec-title .title {
@@ -1934,7 +1953,7 @@ ul {
   font-weight: 600;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  animation: scaleIn 0.8s ease-out forwards;
+  /* animation: scaleIn 0.8s ease-out forwards; */
 }
 
 .react-flow__node:hover {
