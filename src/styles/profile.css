@@ -93,6 +93,7 @@ body.dark {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2rem;
+  padding: 0.5rem;
 }
 
 .profile-info {
@@ -177,6 +178,7 @@ body.dark {
 /* Form Sections */
 .form-section {
   margin-bottom: 1.5rem;
+  padding:  0.5rem;
 }
 
 .section-title {

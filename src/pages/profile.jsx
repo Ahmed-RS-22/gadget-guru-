@@ -49,7 +49,6 @@ function Profile() {
           }
         );
         const result = response.data.data;
-        console.log("Profile data fetched successfully:", result);
         setProfile((prevProfile) => {
           const newProfile = {
             ...result,

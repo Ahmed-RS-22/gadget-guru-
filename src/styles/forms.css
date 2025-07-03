@@ -79,7 +79,7 @@ body {
 .mainform form {
   background-color: var(--white-color);
   width: clamp(300px,45dvw ,90dvw);
-  padding: 20px 30px;
+  padding: 20px 10px;
   height: clamp(650px, 100dvh, fit-content );
   border-radius: 32px;
   border: 1px solid #6666664d;

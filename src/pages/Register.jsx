@@ -100,13 +100,11 @@ const Register = ({ onRegister }) => {
             },
             body: JSON.stringify(payload),
           }
-        );
-
+        );        
         if (!response.ok) {
-          throw new Error("this email is already taken");
+          throw new Error("this email is already taken"); //?
         }
         const result = await response.json();
-        console.log(result);
         console.log("Success:", result);
         //  get a uniqe user
         const user = result.data;
