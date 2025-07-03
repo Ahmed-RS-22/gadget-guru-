@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, use } from "react";
 import axios from "axios";
 import MapPicker from "../components/map";
 import {
@@ -12,6 +12,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import "../styles/profile.css";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -22,6 +23,7 @@ function Profile() {
     new: false,
     confirm: false,
   });
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState({
     first_name: "",
@@ -179,7 +181,11 @@ function Profile() {
       }
     }
   };
-
+  const goToForgetPassword = ()=>{
+      navigate("/forget-password", {
+        state: {userEmail: profile.email},})
+    
+  }
   const handleSaveChanges = () => {
     saveProfileChanges();
   };
@@ -227,6 +233,7 @@ function Profile() {
         );
         setIsPasswordMode(false);
         setError("");
+        console.log("Password changed successfully:", response.data);
       } catch (error) {
         console.error("Password change error:", error);
         setError("Failed to change password. Please try again.");
@@ -252,83 +259,83 @@ function Profile() {
     );
   }
 
-  if (isPasswordMode) {
-    return (
-      <div className="manin-section">
-        <div className="container">
-          <div className="content">
-            <div className="card">
-              <div className="header-gradient" />
-              <div className="card-body">
-                <div className="profile-header">
-                  <div className="profile-info">
-                    <div className="avatar">
-                      <User />
-                    </div>
-                    <div className="user-details">
-                      <h2 className="user-name">
-                        {profile.first_name + " " + profile.last_name}
-                      </h2>
-                      <p className="user-email">{profile.email}</p>
-                    </div>
-                  </div>
-                  <div className="button-group">
-                    <button
-                      onClick={handlePasswordChange}
-                      className="button button-primary"
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      onClick={() => setIsPasswordMode(false)}
-                      className="button button-secondary"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-                <div className="form-section">
-                  <h3 className="section-title">Change Password</h3>{" "}
-                  {error && <span style={{ color: "#e34152" }}>{error}</span>}
-                  {["current", "new", "confirm"].map((field) => (
-                    <div className="form-group" key={field}>
-                      <label className="form-label">
-                        {field === "confirm"
-                          ? "Confirm New Password"
-                          : field === "new"
-                          ? "New Password"
-                          : "Current Password"}
-                      </label>
-                      <div className="input-wrapper">
-                        <input
-                          type={showPassword[field] ? "text" : "password"}
-                          className="form-input password-input"
-                          onChange={(e) =>
-                            setPasswords((prev) => ({
-                              ...prev,
-                              [field]: e.target.value,
-                            }))
-                          }
-                        />
-                        <Lock className="input-icon" />
-                        <button
-                          type="button"
-                          onClick={() => handlePasswordVisibility(field)}
-                          className="password-toggle"
-                        >
-                          {showPassword[field] ? <EyeOff /> : <Eye />}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (isPasswordMode) {
+  //   return (
+  //     <div className="manin-section">
+  //       <div className="container">
+  //         <div className="content">
+  //           <div className="card">
+  //             <div className="header-gradient" />
+  //             <div className="card-body">
+  //               <div className="profile-header">
+  //                 <div className="profile-info">
+  //                   <div className="avatar">
+  //                     <User />
+  //                   </div>
+  //                   <div className="user-details">
+  //                     <h2 className="user-name">
+  //                       {profile.first_name + " " + profile.last_name}
+  //                     </h2>
+  //                     <p className="user-email">{profile.email}</p>
+  //                   </div>
+  //                 </div>
+  //                 <div className="button-group">
+  //                   <button
+  //                     onClick={handlePasswordChange}
+  //                     className="button button-primary"
+  //                   >
+  //                     Save Changes
+  //                   </button>
+  //                   <button
+  //                     onClick={() => setIsPasswordMode(false)}
+  //                     className="button button-secondary"
+  //                   >
+  //                     Cancel
+  //                   </button>
+  //                 </div>
+  //               </div>
+  //               <div className="form-section">
+  //                 <h3 className="section-title">Change Password</h3>{" "}
+  //                 {error && <span style={{ color: "#e34152" }}>{error}</span>}
+  //                 {["current", "new", "confirm"].map((field) => (
+  //                   <div className="form-group" key={field}>
+  //                     <label className="form-label">
+  //                       {field === "confirm"
+  //                         ? "Confirm New Password"
+  //                         : field === "new"
+  //                         ? "New Password"
+  //                         : "Current Password"}
+  //                     </label>
+  //                     <div className="input-wrapper">
+  //                       <input
+  //                         type={showPassword[field] ? "text" : "password"}
+  //                         className="form-input password-input"
+  //                         onChange={(e) =>
+  //                           setPasswords((prev) => ({
+  //                             ...prev,
+  //                             [field]: e.target.value,
+  //                           }))
+  //                         }
+  //                       />
+  //                       <Lock className="input-icon" />
+  //                       <button
+  //                         type="button"
+  //                         onClick={() => handlePasswordVisibility(field)}
+  //                         className="password-toggle"
+  //                       >
+  //                         {showPassword[field] ? <EyeOff /> : <Eye />}
+  //                       </button>
+  //                     </div>
+  //                   </div>
+  //                 ))}
+  //               </div>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="manin-section">
@@ -374,7 +381,7 @@ function Profile() {
                         Edit
                       </button>
                       <button
-                        onClick={() => setIsPasswordMode(true)}
+                        onClick={goToForgetPassword}
                         className="button button-outline"
                       >
                         Change Password
@@ -422,6 +429,7 @@ function Profile() {
                         }))
                       }
                     />
+                  
                   </div>
                 </div>
               </div>

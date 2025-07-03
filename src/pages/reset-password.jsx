@@ -27,12 +27,10 @@ const ResetPassword = () => {
   };
   const handlePasswordReset = async (e) => {
     e.preventDefault();
-
     if (password !== confirmPassword) {
       setFeedbackMessage("Passwords do not match.");
       return;
     }
-
     try {
       const response = await fetch(
         "https://gadetguru.mgheit.com/api/reset-password",
@@ -49,11 +47,8 @@ const ResetPassword = () => {
         }
       );
       const data = await response.json();
-      console.log(data);
-
       if (data.data) {
         setFeedbackMessage("Password reset successfully!");
-
         resetedpassword();
         setTimeout(() => {
           navigate("/login"); // Redirect to a confirmation page

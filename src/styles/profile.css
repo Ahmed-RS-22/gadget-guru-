@@ -113,7 +113,7 @@ body.dark {
 .avatar svg {
   width: 2rem;
   height: 2rem;
-  color: rgb(107, 114, 128);
+  color:var(--white-color);
 }
 
 .user-details {
@@ -219,12 +219,16 @@ body.dark {
 .form-select {
   width: 100%;
   padding: 0.5rem 1rem;
-  background-color: var(--bg-color);
+  background-color: var(--dark-font-color);
   padding-left: 2.5rem;
   border: 1px solid rgb(209, 213, 219);
   border-radius: 0.375rem;
   font-size: 0.875rem;
+  color: var(--white-color);
   transition: border-color 0.2s;
+}
+.form-group .input-wrapper .form-select{
+  padding-left: 2.5rem;
 }
 
 .form-input:focus,
@@ -247,7 +251,7 @@ body.dark {
   transform: translateY(-50%);
   width: 1rem;
   height: 1rem;
-  color: rgb(156, 163, 175);
+  color: var(--white-color);
 }
 
 /* Password Fields */

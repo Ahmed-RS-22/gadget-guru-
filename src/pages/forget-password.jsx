@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // For navigation
+import { useLocation, useNavigate } from "react-router-dom"; // For navigation
 import "../styles/forms.css";
 import logo from "../assets/logo-1.png"
 
 
 const ForgetPassword = () => {
-  const [email, setEmail] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const navigate = useNavigate(); // Hook to handle navigation
-
+  const location = useLocation();
+  const userEmail = location.state?.userEmail || ""; 
+  console.log("userEmail:", userEmail); // Debugging line to check the email value
+  
+  const [email, setEmail] = useState(userEmail || "");
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
@@ -53,9 +56,9 @@ const ForgetPassword = () => {
         {/* Form */}
         <form id="Reset-password" onSubmit={handleFormSubmit}>
           {/* Header */}
-          <h2 className="title">Forget Password</h2>
+          <h2 className="title">{userEmail ? "Change password ":"Forget Password"}</h2>
           <p className="r-message">
-            Enter your email to receive instructions for resetting your password.
+            {userEmail ? " change your password." : "Please enter your email to reset your password."}
           </p>
 
           {/* Input Fields */}
@@ -70,6 +73,7 @@ const ForgetPassword = () => {
                 required
                 placeholder="Enter your email address"
                 value={email}
+                disabled={userEmail ? true : false}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
