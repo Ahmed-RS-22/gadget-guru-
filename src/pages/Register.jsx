@@ -64,6 +64,13 @@ const Register = ({ onRegister }) => {
       });
       return false;
     }
+    if (lName.length < 3) {
+      setFeedback({
+        message: "Username must be at least 3 characters.",
+        success: false,
+      });
+      return false;
+    }
     if (!isValidPassword(password)) {
       setFeedback({
         message:
@@ -183,7 +190,7 @@ const handleSubmit = async (e) => {
       console.error("Error:", error);
       setFeedback({
         // If the server returned JSON with a message, use it, else fallback to error.message
-        message: error.response?.data?.message || error.message,
+        message: error.response?.data?.data?.email || error.message,
         success: false,
       });
     }
