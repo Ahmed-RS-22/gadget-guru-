@@ -125,7 +125,7 @@ const Register = ({ onRegister }) => {
       } catch (error) {
         console.error("Error:", error);
         setFeedback({
-          message: error.message,
+          message: error,
           success: false,
         });
       }
