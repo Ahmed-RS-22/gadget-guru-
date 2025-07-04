@@ -9,7 +9,8 @@ const Register = ({ onRegister }) => {
   // sending boolean value to header
   const navigate = useNavigate();
   // Refs for form inputs
-  const nameRef = useRef();
+  const fnameRef = useRef();
+  const lnameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
@@ -46,7 +47,8 @@ const Register = ({ onRegister }) => {
 
   // Validate Input Fields
   const validateInputs = () => {
-    const username = nameRef.current.value;
+    const fName = fnameRef.current.value;
+    const lName = lnameRef.current.value;
     const email = emailRef.current.value.toLocaleLowerCase();
     const password = passwordRef.current.value;
     const confirmPassword = confirmPasswordRef.current.value;
@@ -55,7 +57,7 @@ const Register = ({ onRegister }) => {
       setFeedback({ message: "Please enter a valid email.", success: false });
       return false;
     }
-    if (username.length < 3) {
+    if (fName.length < 3) {
       setFeedback({
         message: "Username must be at least 3 characters.",
         success: false,
@@ -137,8 +139,8 @@ const handleSubmit = async (e) => {
 
   if (validateInputs()) {
     const payload = {
-      first_name: nameRef.current.value.split(" ")[0],
-      last_name: nameRef.current.value.split(" ")[1],
+      first_name: fnameRef.current.value,
+      last_name: lnameRef.current.value,
       email: emailRef.current.value,
       password: passwordRef.current.value,
       password_confirmation: confirmPasswordRef.current.value,
@@ -235,11 +237,21 @@ const handleSubmit = async (e) => {
 
             {/* Username */}
             <div>
-              <label htmlFor="userName">Username</label>
+              <label htmlFor="Fname">First name</label>
               <input
-                ref={nameRef}
+                ref={fnameRef}
                 type="text"
-                id="userName"
+                id="fName"
+                className="input"
+                placeholder="Enter your name"
+              />
+            </div>
+            <div>
+              <label htmlFor="lName">Last name</label>
+              <input
+                ref={lnameRef}
+                type="text"
+                id="lName"
                 className="input"
                 placeholder="Enter your name"
               />
