@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import "../styles/forms.css";
 import { useNavigate, Link } from "react-router-dom";
 import logo from "../assets/logo-1.png";
-import axios from "axios";
+import SocialButtons from "../components/social";
 const Login = ({ onLogin }) => {
   // Refs for form inputs
   const emailRef = useRef();
@@ -91,7 +91,7 @@ const Login = ({ onLogin }) => {
 
         {/* Form */}
         <form id="logIn" onSubmit={handleSubmit}>
-          <h2 className="title">Sign in</h2>
+          <h2 className="title">Log in</h2>
 
           <div className="form-inputs">
             {/* Feedback */}
@@ -138,8 +138,7 @@ const Login = ({ onLogin }) => {
             </div>
 
             {/* Submit Button */}
-            <input type="submit" value="Sign In" id="regSubmit" />
-
+            <input type="submit" value="Log In" id="regSubmit" />
             {/* Terms and Policy */}
             <p className="message">
               By signing in, you agree to the{" "}
@@ -152,33 +151,16 @@ const Login = ({ onLogin }) => {
 
           {/* Other Issues */}
           <div className="problems">
-            <a>Other issue with sign in</a>
+            <h4>Other issue with sign in</h4>
             <Link to="/forget-password">Forget your password</Link>
           </div>
 
           {/* Register Section */}
           <div className="reg">
+              <SocialButtons onPress={handleSocialLogin} />
             <fieldset>
               <legend>New to our community</legend>
               <Link to="/register">Create an account</Link>
-              <button
-                className="google-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSocialLogin("google");
-                }}
-              >
-                <i className="fa-brands fa-google"></i> Sign in with Google
-              </button>
-              <button
-                className="google-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSocialLogin("Github");
-                }}
-              >
-                <i className="fa-brands fa-github"></i> Sign in with Github
-              </button>
             </fieldset>
           </div>
         </form>

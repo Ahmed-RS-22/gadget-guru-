@@ -11,24 +11,29 @@ import team1 from "../assets/team-1.jpg"
 import axios from "axios";
 import Search from "../components/search";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [message ,setMessage]=useState({
-    name:"",
+    fname:"",
+    lname:"",
     email:"",
     subject:"",
     message:""
   })
+  const [userMsg, setUserMsg] = useState({
+    message: "",
+    error: false,
+  });
   const handleMessage= async(e)=>{
-    e.preventDefault();
-    console.log(message);
-    
+    e.preventDefault();    
     const formData = new FormData();
-    formData.append("name", message.name);
+    formData.append("name", message.fname + " " + message.lname);
     formData.append("email", message.email);
     formData.append("subject", message.subject);
     formData.append("message", message.message);
+    
     try{
       const response = await axios.post("https://gadetguru.mgheit.com/api/message",
       formData,{
@@ -38,8 +43,24 @@ const Home = () => {
         
       });
       console.log(response.data);
+      setUserMsg({
+        message: "Your message has been sent successfully!",
+        error: false, 
+      });
+      document.getElementById("contact-Form").reset();
+      setTimeout(() => {
+        setUserMsg({
+          message: "",
+          error: false,
+        });
+      }, 3000);
     }catch(error){
       console.log(error);
+      setUserMsg({
+        message: error,
+        error: true,
+      });
+      return;
     }
   }
   
@@ -257,6 +278,7 @@ const Home = () => {
           </section>
           <section className="sec-2">
             <form id="contact-Form" onSubmit={handleMessage}>
+              <p style={{color:`${userMsg.error ? "red" : "lime" }`}}>{userMsg.message}</p>
               <div className="form-group">
                 {[
                   {
@@ -264,14 +286,14 @@ const Home = () => {
                     label: "First Name",
                     type: "text",
                     placeholder: "enter your first name",
-                    key:"name"
+                    key:"fname"
                   },
                   {
                     id: "Lname",
                     label: "Last Name",
                     type: "text",
                     placeholder: "enter your last name",
-                    key:"name"
+                    key:"lname"
                   },
                   {
                     id: "Contact-email",

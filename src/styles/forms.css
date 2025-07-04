@@ -169,10 +169,11 @@ body {
   display: flex;
   justify-content: space-evenly;
 }
-.problems a{
+.problems h4{
   color: var(--dark-font-color);
   font-size: clamp(0.55rem,0.9dvw + 2px,0.9rem);
   line-height: 21px;
+  font-weight: 400;
 }
 .reg{
   width: 100%;
@@ -210,23 +211,52 @@ body {
 .reg fieldset a:focus{
   transform: scale(0.75);
 }
-.reg fieldset .google-btn{
-  margin-top: 10px;
-  margin-right: auto;
+.reg fieldset .social-btn{
   background-color: #fff;
   color: var(--dark-font-color);
   border: 1px solid var(--dark-font-color);
-  padding: 10px;
-  width: 50%;
+  padding: 5px 15px;
   text-align: center;
   border-radius: 16px;
   font-size: clamp(0.9rem,1dvw + 2px,1.2rem);
   line-height: 27px;
   font-weight: 600;
   transition: all ease-in-out 0.4s ;
+
+  i{
+    margin-right: 5px;
+    transition: all 0.3s;
+  }
+  &:hover{
+    transform: scale(1.05);
+  }
   &:active{
     transform: scale(0.85);
   }
+}
+.reg fieldset.social{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 10px;
+}
+.reg fieldset.social .github{
+  background-color: #14171a;
+  color: white;
+  &:hover i
+  {
+    transform: rotateY(-360deg) translate(-5px ,0);
+  }
+}
+.reg fieldset.social .google{
+  background:linear-gradient(to right, #ea4335, #fbbc05, #34a853, #4285f4);
+  /* background-color: var(--white-color); */
+  transition: all ease-in-out 0.4s ;
+    -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;  
+  -webkit-text-fill-color: transparent;
 }
 .input-success{
   border-color: var(--good-color) !important;

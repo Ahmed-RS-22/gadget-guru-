@@ -140,10 +140,6 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
   }, [getUserInfo]);
 
   const handleNavigation = (path, sectionId) => {
-    // Close mobile menus when navigating
-    setShowNav(false);
-    setShowUserMenu(false);
-    
     if (location.pathname === path) {
       // Scroll within the current page
       const section = document.getElementById(sectionId);
@@ -155,7 +151,6 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
       navigate(`${path}#${sectionId}`);
     }
   };
-
   // Toggle nav menu
   const toggleNav = () => {
     setShowNav((prev) => !prev);
@@ -208,7 +203,6 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
       "main  > section:not(:nth-child(4))"
     );
     const navLinks = document.querySelectorAll(".navbar .link a");
-    
     // Function to remove 'active' class from all nav links
     const removeActiveClasses = () => {
       navLinks.forEach((link) => link.classList.remove("active"));
@@ -252,7 +246,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  }, []);
+  });
 
   const handlelogout = async () => {
     // sending token  to api endpoint
@@ -424,7 +418,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                     <div className="user-detailes">
                       <span className="name">
                         {myuser.first_name
-                          ? myuser.first_name + " " + myuser.last_name
+                          ? myuser.first_name
                           : "username"}
                       </span>
                       <span className="email">{myuser?.email}</span>

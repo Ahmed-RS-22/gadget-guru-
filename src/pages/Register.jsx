@@ -2,7 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import "../styles/forms.css";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import logo from "../assets/logo-1.png"
+import logo from "../assets/logo-1.png";
+import SocialButtons from "../components/social";
 const Register = ({ onRegister }) => {
   // sending boolean value to header
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const Register = ({ onRegister }) => {
   });
   useEffect(() => {
     localStorage.setItem("userInfo", JSON.stringify(userInfo));
-  },[userInfo]);
+  }, [userInfo]);
 
   // Toggle Password Visibility
   const togglePasswordVisibility = (field) => {
@@ -100,9 +101,9 @@ const Register = ({ onRegister }) => {
             },
             body: JSON.stringify(payload),
           }
-        );        
+        );
         if (!response.ok) {
-          throw new Error("this email is already taken"); //?
+          throw new Error(response.data); //?
         }
         const result = await response.json();
         console.log("Success:", result);
@@ -135,6 +136,10 @@ const Register = ({ onRegister }) => {
       localStorage.setItem("userInfo", JSON.stringify(userInfo));
     }
   }, [userInfo]);
+  // login usinig social media
+  const handleSocialLogin = async (provider) => {
+    window.location.href = `https://gadetguru.mgheit.com/api/${provider}/login`;
+  };
 
   return (
     <main className="mainform">
@@ -239,13 +244,14 @@ const Register = ({ onRegister }) => {
               and <span>Privacy Policy.</span>
             </p>
           </div>
-          {/* Redirect to Login */}
-          <p className="log-reg">
-            Already have an account?{" "}
-            <Link to="/login" id="logIn">
-              Log in
-            </Link>
-          </p>
+          {/* Social Buttons */}
+          <div className="reg">
+            <SocialButtons onPress={handleSocialLogin} />
+            <fieldset>
+              <legend>Already have an account ?</legend>
+              <Link to="/login"> Log in</Link>
+            </fieldset>
+          </div>
         </form>
       </div>
     </main>
