@@ -103,7 +103,7 @@ const Register = ({ onRegister }) => {
           }
         );
         if (!response.ok) {
-          throw new Error(response.data); //?
+          throw new Error(response); //?
         }
         const result = await response.json();
         console.log("Success:", result);
