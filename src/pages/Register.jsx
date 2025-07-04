@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo-1.png";
 import SocialButtons from "../components/social";
+import axios from "axios";
 const Register = ({ onRegister }) => {
   // sending boolean value to header
   const navigate = useNavigate();
@@ -79,58 +80,114 @@ const Register = ({ onRegister }) => {
   };
 
   // Handle Form Submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
 
-    if (validateInputs()) {
-      const payload = {
-        first_name: nameRef.current.value.split(" ")[0],
-        last_name: nameRef.current.value.split(" ")[1],
-        email: emailRef.current.value,
-        password: passwordRef.current.value,
-        password_confirmation: confirmPasswordRef.current.value,
-      };
-      try {
-        const response = await fetch(
-          "https://gadetguru.mgheit.com/api/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            body: JSON.stringify(payload),
-          }
-        );
-        if (!response.ok) {
-          throw new Error(response); //?
+  //   if (validateInputs()) {
+  //     const payload = {
+  //       first_name: nameRef.current.value.split(" ")[0],
+  //       last_name: nameRef.current.value.split(" ")[1],
+  //       email: emailRef.current.value,
+  //       password: passwordRef.current.value,
+  //       password_confirmation: confirmPasswordRef.current.value,
+  //     };
+  //     try {
+  //       const response = await fetch(
+  //         "https://gadetguru.mgheit.com/api/register",
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Accept: "application/json",
+  //           },
+  //           body: JSON.stringify(payload),
+  //         }
+  //       );
+  //       if (!response.ok) {
+  //         throw new Error(response.data); //?
+  //       }
+  //       const result = await response.json();
+  //       console.log("Success:", result);
+  //       //  get a uniqe user
+  //       const user = result.data;
+  //       setFeedback({ message: result.message, success: true });
+
+  //       //  save the user token to local storag
+  //       onRegister(user);
+  //       setUserInfo({
+  //         token: user.token,
+  //         isUserLoggedIn: true,
+  //       });
+
+  //       // sending user info to header
+  //       setTimeout(() => {
+  //         navigate("/home");
+  //       }, 4000);
+  //     } catch (error) {
+  //       console.error("Error:", error);
+  //       setFeedback({
+  //         message: error,
+  //         success: false,
+  //       });
+  //     }
+  //   }
+  // };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (validateInputs()) {
+    const payload = {
+      first_name: nameRef.current.value.split(" ")[0],
+      last_name: nameRef.current.value.split(" ")[1],
+      email: emailRef.current.value,
+      password: passwordRef.current.value,
+      password_confirmation: confirmPasswordRef.current.value,
+    };
+
+    try {
+      const response = await axios.post(
+        "https://gadetguru.mgheit.com/api/register",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          // Axios will reject non-2xx by default, so this matches your fetch .ok check
+          validateStatus: (status) => status >= 200 && status < 300,
         }
-        const result = await response.json();
-        console.log("Success:", result);
-        //  get a uniqe user
-        const user = result.data;
-        setFeedback({ message: result.message, success: true });
+      );
 
-        //  save the user token to local storag
-        onRegister(user);
-        setUserInfo({
-          token: user.token,
-          isUserLoggedIn: true,
-        });
+      // Axios wraps the JSON in `data`
+      const result = response.data;
+      console.log("Success:", result);
 
-        // sending user info to header
-        setTimeout(() => {
-          navigate("/home");
-        }, 4000);
-      } catch (error) {
-        console.error("Error:", error);
-        setFeedback({
-          message: error,
-          success: false,
-        });
-      }
+      // get a unique user
+      const user = result.data;
+      setFeedback({ message: result.message, success: true });
+
+      // save the user token to local storage
+      onRegister(user);
+      setUserInfo({
+        token: user.token,
+        isUserLoggedIn: true,
+      });
+
+      // sending user info to header
+      setTimeout(() => {
+        navigate("/home");
+      }, 4000);
+    } catch (error) {
+      console.error("Error:", error);
+      setFeedback({
+        // If the server returned JSON with a message, use it, else fallback to error.message
+        message: error.response?.data?.message || error.message,
+        success: false,
+      });
     }
-  };
+  }
+};
+
   useEffect(() => {
     if (userInfo) {
       localStorage.setItem("userInfo", JSON.stringify(userInfo));
