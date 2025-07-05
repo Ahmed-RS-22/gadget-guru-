@@ -15,16 +15,7 @@ export default function Verify({ onLogin }) {
         const email = params.get('email');
         const token = params.get('token');
         
-        console.log('Verification params:', { email: !!email, token: !!token });
-        
-        if (!email || !token) {
-          console.error('Missing email or token parameters');
-          setVerificationStatus('error');
-          setMessage('Invalid verification link. Missing required parameters.');
-          setTimeout(() => navigate('/login', { replace: true }), 3000);
-          return;
-        }
-
+        console.log('Verification params:', { email: email, token: token });
         // Simulate verification process
         setMessage('Email verified successfully! Logging you in...');
         setVerificationStatus('success');
