@@ -22,7 +22,7 @@ export default function Verify({ onLogin }) {
           console.error('Missing email or token parameters');
           setVerificationStatus('error');
           setMessage('Invalid verification link. Missing required parameters.');
-          setTimeout(() => navigate('/home', { replace: true }), 3000);
+          setTimeout(() => navigate('/login', { replace: true }), 3000);
           return;
         }
 
@@ -38,7 +38,6 @@ export default function Verify({ onLogin }) {
         });
 
         console.log('Verification response:', response.data);
-
         if (response.data && response.data.data) {
           const userData = response.data.data;
           
@@ -60,7 +59,7 @@ export default function Verify({ onLogin }) {
             window.dispatchEvent(new CustomEvent('userLoggedIn', { detail: userInfo }));
             
             // Call the login handler
-            onLogin({ token: userData.token, isUserLoggedIn: true });
+            onLogin(userData);
             
             // Navigate to home after a short delay
             setTimeout(() => {
@@ -69,7 +68,7 @@ export default function Verify({ onLogin }) {
           } else {
             // Email verified but no auto-login token
             setVerificationStatus('success');
-            setMessage('Email verified successfully! Redirecting to home page...');
+            setMessage('Email verified successfully! Please log in to continue.');
             setTimeout(() => {
               navigate('/home', { replace: true });
             }, 3000);
@@ -103,9 +102,9 @@ export default function Verify({ onLogin }) {
         setVerificationStatus('error');
         setMessage(errorMessage);
         
-        // Redirect to home after showing error
+        // Redirect to login after showing error
         setTimeout(() => {
-          navigate('/home', { replace: true });
+          navigate('/login', { replace: true });
         }, 5000);
       } finally {
         setIsProcessing(false);
@@ -212,7 +211,7 @@ export default function Verify({ onLogin }) {
         
         {verificationStatus === 'error' && (
           <button
-            onClick={() => navigate('/home', { replace: true })}
+            onClick={() => navigate('/', { replace: true })}
             style={{
               backgroundColor: '#007aff',
               color: 'white',
@@ -227,7 +226,7 @@ export default function Verify({ onLogin }) {
             onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
             onMouseOut={(e) => e.target.style.backgroundColor = '#007aff'}
           >
-            Go to Home
+            Go home
           </button>
         )}
         
