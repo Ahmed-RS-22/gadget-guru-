@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
-export default function Verfiy({ onLogin }) {
+export default function Verify({ onLogin }) {
   const navigate = useNavigate();
   const { search } = useLocation();
   const [isProcessing, setIsProcessing] = useState(true);
@@ -13,30 +14,28 @@ export default function Verfiy({ onLogin }) {
         const token = params.get('token');
         console.log('Token from URL:', token);
         
-        if (token) {
-          // Create proper user info object
-          const userInfo = {
-            token: token,
-            isUserLoggedIn: true,
-          };
-
-          // Save to localStorage immediately
-          localStorage.setItem('userInfo', JSON.stringify(userInfo));
-          
-          // Dispatch a custom event to notify other components
-          window.dispatchEvent(new CustomEvent('userLoggedIn', { detail: userInfo }));
-          
-          // Call the login handler
-          onLogin();
-          
-          // Force a small delay to ensure all state updates complete
-          setTimeout(() => {
-            navigate('/home', { replace: true });
-          }, 200);
-        } else {
+        if (!token) {
           console.error('No token received from social login');
-          navigate('/login', { replace: true });
+          return navigate('/login', { replace: true });
         }
+
+        // 1) Build your userInfo object
+        const userInfo = {
+          token,
+          isUserLoggedIn: true,
+        };
+
+        // 2) Persist to localStorage
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+        // 3) Configure axios (or your fetch wrapper) to send the token
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        // 4) Notify the rest of the app that we’re logged in
+        onLogin(userInfo);
+
+        // 5) Finally, navigate to the protected home
+        navigate('/home', { replace: true });
       } catch (error) {
         console.error('Error processing social callback:', error);
         navigate('/login', { replace: true });
