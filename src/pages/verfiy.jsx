@@ -42,16 +42,20 @@ export default function Verify({ onLogin }) {
         if (response.data && response.data.data) {
           const userData = response.data.data;
           
-          // Check if user data contains a token for auto-login
-          if (userData.token) {
+          // Always try to auto-login if we have user data
+          if (userData.token || userData.access_token) {
+            const authToken = userData.token || userData.access_token;
+            
             setVerificationStatus('success');
             setMessage('Email verified successfully! Logging you in...');
             
             // Create proper user info object
             const userInfo = {
-              token: userData.token,
+              token: authToken,
               isUserLoggedIn: true,
             };
+
+            console.log('Auto-logging in user with token:', authToken);
 
             // Save to localStorage immediately
             localStorage.setItem('userInfo', JSON.stringify(userInfo));
@@ -59,19 +63,22 @@ export default function Verify({ onLogin }) {
             // Dispatch a custom event to notify other components
             window.dispatchEvent(new CustomEvent('userLoggedIn', { detail: userInfo }));
             
-            // Call the login handler
-            onLogin({ token: userData.token, isUserLoggedIn: true });
+            // Call the login handler with the user data
+            onLogin({ token: authToken, isUserLoggedIn: true });
             
-            // Navigate to home after a short delay
+            // Wait a bit longer to ensure login state is properly set
             setTimeout(() => {
-              navigate('/home', { replace: true });
-            }, 2000);
+              setMessage('Login successful! Redirecting to home...');
+              setTimeout(() => {
+                navigate('/home', { replace: true });
+              }, 1000);
+            }, 1500);
           } else {
-            // Email verified but no auto-login token
+            // Email verified but no token for auto-login
             setVerificationStatus('success');
-            setMessage('Email verified successfully! Redirecting to home page...');
+            setMessage('Email verified successfully! Please log in to access your account.');
             setTimeout(() => {
-              navigate('/home', { replace: true });
+              navigate('/login', { replace: true });
             }, 3000);
           }
         } else {
@@ -103,9 +110,9 @@ export default function Verify({ onLogin }) {
         setVerificationStatus('error');
         setMessage(errorMessage);
         
-        // Redirect to home after showing error
+        // Redirect to login after showing error (since verification failed)
         setTimeout(() => {
-          navigate('/home', { replace: true });
+          navigate('/login', { replace: true });
         }, 5000);
       } finally {
         setIsProcessing(false);
@@ -212,7 +219,7 @@ export default function Verify({ onLogin }) {
         
         {verificationStatus === 'error' && (
           <button
-            onClick={() => navigate('/home', { replace: true })}
+            onClick={() => navigate('/login', { replace: true })}
             style={{
               backgroundColor: '#007aff',
               color: 'white',
@@ -227,7 +234,7 @@ export default function Verify({ onLogin }) {
             onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
             onMouseOut={(e) => e.target.style.backgroundColor = '#007aff'}
           >
-            Go to Home
+            Go to Login
           </button>
         )}
         
