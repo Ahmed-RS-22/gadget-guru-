@@ -12,6 +12,7 @@ import ErrorPage from "./pages/error";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import SocialCallback from "./pages/SocialCallback";
+import Verfiy from "./pages/verfiy";
 import Footer from "./components/footer";
 import Profile from "./pages/profile";
 import ForgetPassword from "./pages/forget-password";
@@ -154,6 +155,11 @@ if(user){
           path="/social-callback"
           element={<SocialCallback onLogin={handleLogin} />}
         />
+        <Route
+          path="/verify"
+          element={<Verfiy onLogin={handleLogin} />}
+        />
+
 
         <Route path="/profile" element={<Profile />} />
         <Route path="/saved" element={<Saved />} />
