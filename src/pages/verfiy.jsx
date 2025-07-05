@@ -71,7 +71,7 @@ export default function Verify({ onLogin }) {
             setVerificationStatus('success');
             setMessage('Email verified successfully! Please log in to continue.');
             setTimeout(() => {
-              navigate('/login', { replace: true });
+              navigate('/home', { replace: true });
             }, 3000);
           }
         } else {
