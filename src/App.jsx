@@ -159,8 +159,6 @@ if(user){
           path="/verify"
           element={<Verfiy onLogin={handleLogin} />}
         />
-
-
         <Route path="/profile" element={<Profile />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/popular" element={<Popular />} />
