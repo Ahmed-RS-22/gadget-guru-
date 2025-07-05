@@ -60,7 +60,7 @@ export default function Verify({ onLogin }) {
             window.dispatchEvent(new CustomEvent('userLoggedIn', { detail: userInfo }));
             
             // Call the login handler
-            onLogin(userData);
+            onLogin({ token: userData.token, isUserLoggedIn: true });
             
             // Navigate to home after a short delay
             setTimeout(() => {
@@ -212,7 +212,7 @@ export default function Verify({ onLogin }) {
         
         {verificationStatus === 'error' && (
           <button
-            onClick={() => navigate('/login', { replace: true })}
+            onClick={() => navigate('/', { replace: true })}
             style={{
               backgroundColor: '#007aff',
               color: 'white',
@@ -227,7 +227,7 @@ export default function Verify({ onLogin }) {
             onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
             onMouseOut={(e) => e.target.style.backgroundColor = '#007aff'}
           >
-            Go to Login
+            Go home
           </button>
         )}
         

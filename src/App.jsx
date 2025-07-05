@@ -133,7 +133,7 @@ function App() {
           setUserInfo(latestUserInfo);
           setIsUserLogged(true);
         } else {
-          console.warn('No valid user data provided for login');
+          console.error('No valid user data provided for login');
         }
       } catch (error) {
         console.error("Error reading userInfo during login:", error);
