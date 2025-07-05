@@ -211,7 +211,7 @@ export default function Verify({ onLogin }) {
         
         {verificationStatus === 'error' && (
           <button
-            onClick={() => navigate('/', { replace: true })}
+            onClick={() => navigate('/home', { replace: true })}
             style={{
               backgroundColor: '#007aff',
               color: 'white',
@@ -223,8 +223,7 @@ export default function Verify({ onLogin }) {
               cursor: 'pointer',
               transition: 'all 0.3s ease'
             }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#007aff'}
+
           >
             Go home
           </button>
