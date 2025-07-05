@@ -60,7 +60,6 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
     if (propUserInfo && propUserInfo.token && 
         (propUserInfo.token !== userInfo.token || 
          propUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn)) {
-      console.log('Header: Updating userInfo from props:', propUserInfo);
       setUserInfo(propUserInfo);
     }
   }, [propUserInfo, userInfo.token, userInfo.isUserLoggedIn]);
@@ -70,8 +69,6 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
     // Check both prop and state for login status
     const isLoggedIn = isUserLogged || userInfo?.isUserLoggedIn;
     const token = userInfo?.token;
-    
-    console.log('Header: getUserInfo called with:', { isLoggedIn, hasToken: !!token });
     
     if (isLoggedIn && token) {
       try {
@@ -83,8 +80,6 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
         });
         
         const result = response.data.data;
-        console.log('Header: Profile fetched successfully:', result);
-        
         setMyuser(prevUser => {
           // Only update if the data has actually changed
           if (JSON.stringify(prevUser) !== JSON.stringify(result)) {
@@ -93,16 +88,14 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
           return prevUser;
         });
       } catch (error) {
-        console.error("Header: Error fetching user profile:", error);
-        
-        // Only logout if it's a 401 error and we're not on the verify page
-        if (error.response?.status === 401 && !location.pathname.includes('/verify')) {
-          console.log('Header: 401 error, logging out user');
+        console.error("Error fetching user profile:", error);
+        // If token is invalid, logout the user
+        if (error.response?.status === 401) {
           handlelogout();
         }
       }
     }
-  }, [userInfo?.token, userInfo?.isUserLoggedIn, isUserLogged, location.pathname]);
+  }, [userInfo?.token, userInfo?.isUserLoggedIn, isUserLogged]);
 
   // Listen for localStorage changes (for social login and cross-tab sync)
   useEffect(() => {
@@ -111,8 +104,6 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
         const stored = localStorage.getItem("userInfo");
         if (stored) {
           const parsedUserInfo = JSON.parse(stored);
-          console.log('Header: Storage changed, updating userInfo:', parsedUserInfo);
-          
           // Only update if the data has actually changed
           if (parsedUserInfo.token !== userInfo.token || 
               parsedUserInfo.isUserLoggedIn !== userInfo.isUserLoggedIn) {
@@ -128,8 +119,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
     window.addEventListener('storage', handleStorageChange);
     
     // Also listen for a custom event we'll dispatch after social login
-    const handleLoginEvent = (event) => {
-      console.log('Header: UserLoggedIn event received:', event.detail);
+    const handleLoginEvent = () => {
       handleStorageChange();
     };
     window.addEventListener('userLoggedIn', handleLoginEvent);
@@ -142,18 +132,12 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
 
   // Call getUserInfo when userInfo or login status changes, but with debouncing
   useEffect(() => {
-    // Don't fetch profile if we're on the verify page to avoid conflicts
-    if (location.pathname.includes('/verify')) {
-      console.log('Header: Skipping profile fetch on verify page');
-      return;
-    }
-
     const timeoutId = setTimeout(() => {
       getUserInfo();
     }, 100); // Small delay to prevent rapid calls
 
     return () => clearTimeout(timeoutId);
-  }, [getUserInfo, location.pathname]);
+  }, [getUserInfo]);
 
   const handleNavigation = (path, sectionId) => {
     if (location.pathname === path) {
@@ -265,8 +249,6 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
   });
 
   const handlelogout = async () => {
-    console.log('Header: Logout initiated');
-    
     // sending token  to api endpoint
     try {
       const token = userInfo?.token;
@@ -284,7 +266,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
           throw new Error("Logout failed.");
         }
         const result = await response.json();
-        console.log("Header: Logout API success:", result);
+        console.log("Success:", result);
       }
 
       // Clear user data
@@ -299,9 +281,8 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
       
       onLogout();
       navigate("/login");
-      console.log('Header: Logout completed');
     } catch (error) {
-      console.error("Header: Logout error:", error);
+      console.error("Logout error:", error);
       // Even if API call fails, clear local data
       const resetUserInfo = {
         token: "",
