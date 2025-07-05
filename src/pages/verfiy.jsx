@@ -16,41 +16,52 @@ export default function Verify({ onLogin }) {
         const token = params.get('token');
         
         console.log('Verification params:', { email: email, token: token });
-        // Simulate verification process
-              if ( !token) {
-          console.error('Missing email or token parameters');
+        
+        if (!token) {
+          console.error('Missing token parameter');
           setVerificationStatus('error');
-          setMessage('Invalid verification link. Missing required parameters.');
+          setMessage('Invalid verification link. Missing token.');
           setTimeout(() => navigate('/login', { replace: true }), 3000);
           return;
         }
+
         setMessage('Email verified successfully! Logging you in...');
         setVerificationStatus('success');
         
         // Create user info object for auto-login
         const userInfo = {
-          token: token, // Use the token from URL
+          token: token,
           isUserLoggedIn: true,
         };
 
-        // Save to localStorage immediately
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        console.log('Setting up auto-login with:', userInfo);
+
+        // Clear any existing user data first to prevent conflicts
+        localStorage.removeItem('userInfo');
         
-        // Dispatch a custom event to notify other components
-        window.dispatchEvent(new CustomEvent('userLoggedIn', { detail: userInfo }));
-        
-        // Call the login handler
-        onLogin(userInfo);
-        
-        // Update message to show login success
+        // Wait a moment then set the new data
         setTimeout(() => {
+          localStorage.setItem('userInfo', JSON.stringify(userInfo));
+          
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(new CustomEvent('userLoggedIn', { detail: userInfo }));
+          
+          // Call the login handler with the user info
+          if (onLogin) {
+            onLogin(userInfo);
+          }
+          
+          console.log('Auto-login completed, user info set:', userInfo);
+          
+          // Update message to show login success
           setMessage('Login successful! Redirecting to home...');
-        }, 1000);
-        
-        // Navigate to home after showing success message
-        setTimeout(() => {
-          navigate('/home', { replace: true });
-        }, 2500);
+          
+          // Navigate to home after showing success message
+          setTimeout(() => {
+            console.log('Redirecting to home page...');
+            navigate('/home', { replace: true });
+          }, 1500);
+        }, 500);
         
       } catch (error) {
         console.error('Email verification error:', error);
