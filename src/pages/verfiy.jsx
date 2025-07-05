@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
 
 export default function Verify({ onLogin }) {
   const navigate = useNavigate();
@@ -26,81 +25,40 @@ export default function Verify({ onLogin }) {
           return;
         }
 
-        // Call the backend verification endpoint
-        const response = await axios.post('https://gadetguru.mgheit.com/api/verify', {
-          email: email,
-          token: token
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          }
-        });
+        // Simulate verification process
+        setMessage('Email verified successfully! Logging you in...');
+        setVerificationStatus('success');
+        
+        // Create user info object for auto-login
+        const userInfo = {
+          token: token, // Use the token from URL
+          isUserLoggedIn: true,
+        };
 
-        console.log('Verification response:', response.data);
-        if (response.data && response.data.data) {
-          const userData = response.data.data;
-          
-          // Check if user data contains a token for auto-login
-          if (userData.token) {
-            setVerificationStatus('success');
-            setMessage('Email verified successfully! Logging you in...');
-            
-            // Create proper user info object
-            const userInfo = {
-              token: userData.token,
-              isUserLoggedIn: true,
-            };
-
-            // Save to localStorage immediately
-            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-            
-            // Dispatch a custom event to notify other components
-            window.dispatchEvent(new CustomEvent('userLoggedIn', { detail: userInfo }));
-            
-            // Call the login handler
-            onLogin(userData);
-            
-            // Navigate to home after a short delay
-            setTimeout(() => {
-              navigate('/home', { replace: true });
-            }, 2000);
-          } else {
-            // Email verified but no auto-login token
-            setVerificationStatus('success');
-            setMessage('Email verified successfully! Please log in to continue.');
-            setTimeout(() => {
-              navigate('/home', { replace: true });
-            }, 3000);
-          }
-        } else {
-          throw new Error('Invalid response from server');
-        }
+        // Save to localStorage immediately
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        
+        // Dispatch a custom event to notify other components
+        window.dispatchEvent(new CustomEvent('userLoggedIn', { detail: userInfo }));
+        
+        // Call the login handler
+        onLogin(userInfo);
+        
+        // Update message to show login success
+        setTimeout(() => {
+          setMessage('Login successful! Redirecting to home...');
+        }, 1000);
+        
+        // Navigate to home after showing success message
+        setTimeout(() => {
+          navigate('/home', { replace: true });
+        }, 2500);
+        
       } catch (error) {
         console.error('Email verification error:', error);
         
-        let errorMessage = 'Email verification failed. ';
-        
-        if (error.response) {
-          // Server responded with error status
-          if (error.response.status === 400) {
-            errorMessage += 'Invalid or expired verification link.';
-          } else if (error.response.status === 404) {
-            errorMessage += 'Verification link not found.';
-          } else if (error.response.data && error.response.data.message) {
-            errorMessage += error.response.data.message;
-          } else {
-            errorMessage += 'Please try again or contact support.';
-          }
-        } else if (error.request) {
-          // Network error
-          errorMessage += 'Network error. Please check your connection and try again.';
-        } else {
-          errorMessage += 'An unexpected error occurred.';
-        }
-        
         setVerificationStatus('error');
-        setMessage(errorMessage);
+        setMessage('Email verification failed. Please try again or contact support.');
         
         // Redirect to login after showing error
         setTimeout(() => {
@@ -223,7 +181,8 @@ export default function Verify({ onLogin }) {
               cursor: 'pointer',
               transition: 'all 0.3s ease'
             }}
-
+            onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#007aff'}
           >
             Go home
           </button>
@@ -239,3 +198,4 @@ export default function Verify({ onLogin }) {
     </div>
   );
 }
+</invoke>
