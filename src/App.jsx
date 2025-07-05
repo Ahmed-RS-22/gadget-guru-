@@ -67,8 +67,26 @@ function App() {
     // Listen for storage changes from other tabs/windows
     window.addEventListener("storage", handleStorageChange);
 
+    // Listen for custom userLoggedIn event (for verification and social login)
+    const handleUserLoggedIn = (event) => {
+      console.log('UserLoggedIn event received:', event.detail);
+      try {
+        const stored = localStorage.getItem("userInfo");
+        if (stored) {
+          const parsedUserInfo = JSON.parse(stored);
+          setUserInfo(parsedUserInfo);
+          setIsUserLogged(parsedUserInfo.isUserLoggedIn);
+        }
+      } catch (error) {
+        console.error("Error handling userLoggedIn event:", error);
+      }
+    };
+
+    window.addEventListener("userLoggedIn", handleUserLoggedIn);
+
     return () => {
       window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("userLoggedIn", handleUserLoggedIn);
     };
   }, []);
 
@@ -94,34 +112,32 @@ function App() {
 
   // Memoize the login handler to prevent unnecessary re-renders
   const handleLogin = useCallback((user) => {
-if(user){
-      localStorage.setItem(
-      "userInfo",
-      JSON.stringify({
+    console.log('handleLogin called with:', user);
+    
+    if (user && user.token) {
+      const newUserInfo = {
         token: user.token,
         isUserLoggedIn: true,
-      })
-    );
-}
-    try {
-      // Force re-read from localStorage to get the latest data
-      const latestUserInfo = JSON.parse(localStorage.getItem("userInfo"));
-      if (
-        latestUserInfo &&
-        latestUserInfo.isUserLoggedIn &&
-        latestUserInfo.token
-      ) {
-        // Update both states immediately
-        setUserInfo(latestUserInfo);
-        setIsUserLogged(true);
-      } else {
-        // Fallback - just set logged in state
-        setIsUserLogged(true);
-      }
-    } catch (error) {
-      console.error("Error reading userInfo during login:", error);
-      // Fallback - just set logged in state
+      };
+      
+      localStorage.setItem("userInfo", JSON.stringify(newUserInfo));
+      setUserInfo(newUserInfo);
       setIsUserLogged(true);
+      
+      console.log('User logged in successfully:', newUserInfo);
+    } else {
+      // Fallback - try to read from localStorage
+      try {
+        const latestUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+        if (latestUserInfo && latestUserInfo.isUserLoggedIn && latestUserInfo.token) {
+          setUserInfo(latestUserInfo);
+          setIsUserLogged(true);
+        } else {
+          console.warn('No valid user data provided for login');
+        }
+      } catch (error) {
+        console.error("Error reading userInfo during login:", error);
+      }
     }
   }, []);
 
@@ -134,6 +150,7 @@ if(user){
     setUserInfo(resetUserInfo);
     setIsUserLogged(false);
     localStorage.setItem("userInfo", JSON.stringify(resetUserInfo));
+    console.log('User logged out successfully');
   }, []);
 
   return (
