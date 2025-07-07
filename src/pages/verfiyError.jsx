@@ -33,7 +33,7 @@ export default function VerfiyError() {
       <div style={styles.errorIcon}>⚠️</div>
       <h1 style={styles.title}>Verification Failed</h1>
       <div style={styles.messageContainer}>
-        <p style={styles.message}>{message}</p>
+        <p style={styles.message}>{message.replace(/%/g, " ")}</p>
       </div>
       <p style={styles.subMessage}>
         Please try again or contact support if the problem persists.
