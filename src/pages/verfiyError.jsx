@@ -8,6 +8,8 @@ export default function VerfiyError() {
   // Extract the error message from URL search params
   const searchParams = new URLSearchParams(location.search);
   const message = searchParams.get("message") || "An unexpected error has occurred.";
+  const searchParams = new URLSearchParams(location.search);
+  const message = searchParams.get("message") || "An unexpected error has occurred.";
   
   console.log("Location search:", location.search);
   console.log("Search params:", searchParams.toString());
@@ -21,6 +23,16 @@ export default function VerfiyError() {
         <p style={styles.message}>{decodeURIComponent(message)}</p>
       </div>
       <p style={styles.subMessage}>
+        Please try again or contact support if the problem persists.
+      </p>
+      <div style={styles.buttonContainer}>
+        <button style={styles.button} onClick={() => navigate("/home")}>
+          Go Home
+        </button>
+        <button style={styles.buttonSecondary} onClick={() => navigate("/login")}>
+          Try Login Again
+        </button>
+      </div>
         Please try again or contact support if the problem persists.
       </p>
       <div style={styles.buttonContainer}>
@@ -52,6 +64,13 @@ const styles = {
     fontSize: "4rem",
     marginBottom: "1rem",
     animation: "pulse 2s infinite",
+    backgroundColor: "#fef2f2",
+    fontFamily: "Poppins, sans-serif",
+  },
+  errorIcon: {
+    fontSize: "4rem",
+    marginBottom: "1rem",
+    animation: "pulse 2s infinite",
   },
   title: {
     fontSize: "2.5rem",
@@ -66,6 +85,30 @@ const styles = {
     padding: "1.5rem",
     marginBottom: "1.5rem",
     maxWidth: "600px",
+    width: "100%",
+    fontWeight: "600",
+  },
+  messageContainer: {
+    backgroundColor: "#fee2e2",
+    border: "1px solid #fecaca",
+    borderRadius: "8px",
+    fontSize: "1.125rem",
+    color: "#991b1b",
+    margin: "0",
+    lineHeight: "1.6",
+    fontWeight: "500",
+  },
+  subMessage: {
+    fontSize: "1rem",
+    color: "#6b7280",
+    marginBottom: "2rem",
+    maxWidth: "500px",
+  },
+  buttonContainer: {
+    display: "flex",
+    gap: "1rem",
+    flexWrap: "wrap",
+    justifyContent: "center",
     width: "100%",
   },
   message: {
@@ -96,6 +139,20 @@ const styles = {
     backgroundColor: "#3b82f6",
     color: "#fff",
     fontWeight: "600",
+    transition: "all 0.3s ease",
+    minWidth: "120px",
+  },
+  buttonSecondary: {
+    padding: "0.75rem 1.5rem",
+    fontSize: "1rem",
+    cursor: "pointer",
+    borderRadius: "8px",
+    border: "2px solid #6b7280",
+    backgroundColor: "transparent",
+    color: "#6b7280",
+    fontWeight: "600",
+    transition: "all 0.3s ease",
+    minWidth: "120px",
     transition: "all 0.3s ease",
     minWidth: "120px",
   },
