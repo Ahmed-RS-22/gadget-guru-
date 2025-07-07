@@ -138,8 +138,18 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
 
     return () => clearTimeout(timeoutId);
   }, [getUserInfo]);
+  const closeUserMenuWithDelay = () => {
+  setTimeout(() => {
+    console.log("closed");
+    
+    setIsMenuOpen(false);
+    setShowUserMenu(false);
+    setShowNav(false)
+  }, 300);
+};
 
   const handleNavigation = (path, sectionId) => {
+    closeUserMenuWithDelay()
     if (location.pathname === path) {
       // Scroll within the current page
       const section = document.getElementById(sectionId);
@@ -175,7 +185,6 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
       setShowUserMenu(false);
     }
   }, []);
-
   const closeUserMenus = useCallback((e) => {
     if (
       !e.target.closest(".fa-user") &&
@@ -333,7 +342,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
         <div className="container">
           {/* Logo */}
           <div className="logo">
-            <Link to="/home">
+            <Link to="/home"  onClick={closeUserMenuWithDelay}>
               <img src={logo} alt="Gadget Guru Logo" className="logo" />
             </Link>
           </div>
@@ -429,7 +438,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                       <div className="icon-2">
                         <i className="fa-solid fa-user-large"></i>
                       </div>
-                      <Link className="uc-link" to="/profile">
+                      <Link className="uc-link" to="/profile" onClick={closeUserMenuWithDelay}>
                         Account
                       </Link>
                     </li>
@@ -437,7 +446,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                       <div className="icon-2">
                         <i className="fa-solid fa-bookmark"></i>
                       </div>
-                      <Link className="uc-link" to="/saved">
+                      <Link className="uc-link" to="/saved"  onClick={closeUserMenuWithDelay}>
                         Saved ICs
                       </Link>
                     </li>
@@ -445,7 +454,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                       <div className="icon-2">
                         <i className="fa-solid fa-star"></i>
                       </div>
-                      <Link className="uc-link" to="/popular">
+                      <Link className="uc-link" to="/popular" onClick={closeUserMenuWithDelay}>
                         Popular ICs
                       </Link>
                     </li>
@@ -453,7 +462,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                       <div className="icon-2">
                         <Cpu size={24}/>
                       </div>
-                      <Link className="uc-link" to="/logic">
+                      <Link className="uc-link" to="/logic"  onClick={closeUserMenuWithDelay}>
                         Karnaugh Map 
                       </Link>
                     </li>
@@ -461,7 +470,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
                       <div className="icon-2">
                         <i className="fa-solid fa-circle-question"></i>
                       </div>
-                      <Link className="uc-link" to="/tersms-and-conditions">
+                      <Link className="uc-link" to="/tersms-and-conditions"  onClick={closeUserMenuWithDelay}>
                         Help Center
                       </Link>
                     </li>
@@ -510,7 +519,7 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
         <div className="container">
           {/* Logo */}
           <div className="logo">
-            <Link to="/home">
+            <Link to="/home"  onClick={closeUserMenuWithDelay}>
               <img src={logo} alt="Gadget Guru Logo" className="logo" />
             </Link>
           </div>
@@ -548,7 +557,10 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
               </li>
               <li className="link">
                 <a
-                  onClick={() => handleNavigation("/home", "contactUS")}
+                  onClick={() => {
+                    handleNavigation("/home", "contactUS")
+                    
+                  }}
                   name="contactUS"
                 >
                   Contact Us
@@ -579,10 +591,10 @@ const Header = ({ isUserLogged, onLogout, userInfo: propUserInfo }) => {
 
           {/* User Actions */}
           <div className={`user ${showUserMenu ? "show" : ""}`} id="userData">
-            <Link to="/login" className="signin" id="signIn">
+            <Link to="/login" className="signin" id="signIn"  onClick={closeUserMenuWithDelay}>
               Sign In
             </Link>
-            <Link to="/register" className="register" id="Reg">
+            <Link to="/register" className="register" id="Reg"  onClick={closeUserMenuWithDelay}>
               Sign Up
             </Link>
           </div>

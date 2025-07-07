@@ -60,12 +60,12 @@ const Footer = () => {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <i class="fa-brands fa-facebook-f"></i>
+                  <i className="fa-brands fa-facebook-f"></i>
                 </a>
               </li>
               <li>
                 <a href="https://x.com/" target="_blank" rel="noreferrer">
-                  <i class="fa-brands fa-x-twitter"></i>
+                  <i className="fa-brands fa-x-twitter"></i>
                 </a>
               </li>
               <li>
@@ -74,12 +74,12 @@ const Footer = () => {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <i class="fa-brands fa-linkedin-in"></i>
+                  <i className="fa-brands fa-linkedin-in"></i>
                 </a>
               </li>
               <li>
                 <a href="https://github.com/" target="_blank" rel="noreferrer">
-                  <i class="fa-brands fa-github"></i>
+                  <i className="fa-brands fa-github"></i>
                 </a>
               </li>
             </ul>
