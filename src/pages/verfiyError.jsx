@@ -5,7 +5,7 @@ export default function VerfiyError() {
   const { location } = useLocation();
   const { text } = useParams();
   const navigate = useNavigate();
-  console.log("VerfiyError component rendered with params:", text.toString() );
+  console.log("VerfiyError component rendered with params:", JSON.stringify({ text }));
 
   // If you’re passing the error on as a query param, e.g. ?message=Something+went+wrong
   const params = new URLSearchParams(location);
