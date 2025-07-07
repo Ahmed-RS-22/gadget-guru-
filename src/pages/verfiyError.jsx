@@ -1,16 +1,18 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export default function VerfiyError() {
-  const {location} = useLocation();
+  const { location } = useLocation();
+  const { text } = useParams();
   const navigate = useNavigate();
+  console.log("VerfiyError component rendered with params:", { text });
 
   // If you’re passing the error on as a query param, e.g. ?message=Something+went+wrong
   const params = new URLSearchParams(location);
   console.log("Location search params:", params);
   const message = params.get("message") || "An unexpected error has occurred.";
-  console.log( "Error message:", message);
-  
+  console.log("Error message:", message);
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Oops!</h1>
