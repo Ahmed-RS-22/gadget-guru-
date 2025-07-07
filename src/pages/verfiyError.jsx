@@ -7,7 +7,7 @@ export default function VerfiyError() {
 
   // If you’re passing the error on as a query param, e.g. ?message=Something+went+wrong
   const params = new URLSearchParams(location);
-  console.log("Location search params:", params.toString());
+  console.log("Location search params:", params);
   const message = params.get("message") || "An unexpected error has occurred.";
   console.log( "Error message:", message);
   
