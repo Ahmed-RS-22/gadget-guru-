@@ -6,9 +6,10 @@ export default function VerfiyError() {
   const navigate = useNavigate();
 
   // If you’re passing the error on as a query param, e.g. ?message=Something+went+wrong
-  const params = new URLSearchParams(location.search);
+  const params = new URLSearchParams(location);
   const message = params.get("message") || "An unexpected error has occurred.";
-
+  console.log( "Error message:", message);
+  
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Oops!</h1>
