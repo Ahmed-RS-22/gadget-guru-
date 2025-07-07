@@ -389,7 +389,7 @@ ul {
 }
 .home .home-section .container .sec-1 .discover {
   background-color: #007b9fdd;
-  color: var(--white-color);
+  color: white;
   line-height: 24px;
   font-weight: bold;
   font-size: clamp(0.9rem, 1.2dvw, 1.2rem);
@@ -1029,7 +1029,7 @@ ul {
 .team .container .sec-mission .back-lay {
   width: 70%;
   min-height: 350px;
-  background-color: white;
+  background-color: var(--bg-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1052,6 +1052,8 @@ ul {
     font-weight: 400;
     opacity: 0;
     animation: fadeInUp 1s ease-out 1s forwards;
+    background-color: var(--bg-color);
+    color: var(--dark-font-color);
   }
 }
 .team .container .sec-mission .back-lay::after {
