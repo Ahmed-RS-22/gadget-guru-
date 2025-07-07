@@ -58,7 +58,6 @@ const OTPVerification = () => {
       }
     } catch (error){
       console.log(error);
-      
       setFeedbackMessage("Error verifying OTP. Please try again.");
     }
   };

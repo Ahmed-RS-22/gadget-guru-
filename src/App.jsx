@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, } from "react";
 import { Routes, Route, Navigate, HashRouter } from "react-router-dom";
+import axios from "axios";
 import Header from "./components/header";
 import IcInfo from "./pages/ic";
 import Description from "./components/description";
@@ -21,9 +22,10 @@ import ResetPassword from "./pages/reset-password";
 import Logic from "./pages/logic";
 import Home from "./pages/main";
 import TermsAndConditions from "./pages/terms-conditions";
-
+import ProtectedRoute from "./components/privateRoute";
 function App() {
   // Initialize userInfo from localStorage
+  const [isVerfied, setIsVerified] = useState(false); 
   const [userInfo, setUserInfo] = useState(() => {
     try {
       const stored = localStorage.getItem("userInfo");
@@ -66,7 +68,32 @@ function App() {
 
     // Listen for storage changes from other tabs/windows
     window.addEventListener("storage", handleStorageChange);
-
+// chech if user is verfied 
+  const checkVerfication = async () => {
+    if (userInfo?.isUserLoggedIn && userInfo?.token) {
+      try {
+        const response = await axios.get(
+          "https://gadetguru.mgheit.com/api/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${userInfo.token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        const result = response.data.data;
+        setIsVerified(result.is_verified);
+        
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        if (error.response?.status === 401) {
+          // If unauthorized, reset userInfo and isUserLogged
+          setIsVerified(false);
+        }
+      }
+    }
+  };
+    checkVerfication();
     // Listen for custom userLoggedIn event (for verification and social login)
     const handleUserLoggedIn = (event) => {
       console.log('UserLoggedIn event received:', event.detail);
@@ -176,7 +203,7 @@ function App() {
           path="/verify"
           element={<Verfiy onLogin={handleLogin} />}
         />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<ProtectedRoute allowed ={isVerfied} redirectPath ="/home"><Profile/> </ProtectedRoute>} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/popular" element={<Popular />} />
         <Route path="/logic" element={<Logic />} />

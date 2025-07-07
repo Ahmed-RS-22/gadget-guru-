@@ -55,7 +55,7 @@ function Profile() {
             country: result.country || "Egypt",
             language: result.language || "English",
             phone: result.phone ?? "", // <--- add this line
-          };
+          };          
 
           // Only update if the data has actually changed
           if (JSON.stringify(prevProfile) !== JSON.stringify(newProfile)) {
