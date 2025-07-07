@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function VerfiyError() {
-  const location = useLocation();
+  const {location} = useLocation();
   const navigate = useNavigate();
 
   // If you’re passing the error on as a query param, e.g. ?message=Something+went+wrong
