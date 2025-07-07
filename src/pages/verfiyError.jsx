@@ -1,29 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export default function VerfiyError() {
-  const {location} = useLocation();
+export default function VerifyError() {
+  const location = useLocation();        // ← this is your full location object
   const navigate = useNavigate();
+  const [message, setMessage] = useState("");
 
-  // If you’re passing the error on as a query param, e.g. ?message=Something+went+wrong
-  const params = new URLSearchParams(location);
-  console.log("Location search params:", params);
-  const message = params.get("message") || "An unexpected error has occurred.";
-  console.log( "Error message:", message);
-  
+  useEffect(() => {
+    // 1) Read the ?message=… param
+    const params = new URLSearchParams(location.search);
+    const msg = params.get("message") || "An unexpected error has occurred.";
+    setMessage(decodeURIComponent(msg));
+    console.log("Error message:", msg +"\n" + " params" + params);
+    
+
+    // 2) (Optional) scrub the ?message from the URL so it disappears
+    //    without causing a page reload
+    window.history.replaceState(null, "", location.pathname);
+  }, [location.search, location.pathname]);
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Oops!</h1>
-      <p style={styles.message}>{decodeURIComponent(message)}</p>
-
-      <button style={styles.button} onClick={() => navigate("/home")}>
+      <p style={styles.message}>{message}</p>
+      <button
+        style={styles.button}
+        onClick={() => navigate("/home", { replace: true })}
+      >
         Go Back
       </button>
     </div>
   );
 }
 
-// Optional: inline styles, or replace with your CSS/module
 const styles = {
   container: {
     minHeight: "80vh",
