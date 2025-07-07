@@ -23,6 +23,7 @@ import Logic from "./pages/logic";
 import Home from "./pages/main";
 import TermsAndConditions from "./pages/terms-conditions";
 import ProtectedRoute from "./components/privateRoute";
+import VerfiyError from "./pages/verfiyError";
 function App() {
   // Initialize userInfo from localStorage
   const [isVerfied, setIsVerified] = useState(false); 
@@ -222,6 +223,10 @@ function App() {
           element={<TermsAndConditions></TermsAndConditions>}
         />
         <Route path="*" element={<ErrorPage />} />
+        <Route
+          path="/erorr"
+          element={<VerfiyError />} 
+        />
       </Routes>
       <Footer></Footer>
     </HashRouter>
