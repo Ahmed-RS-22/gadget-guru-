@@ -29,18 +29,19 @@ export default function VerfiyError() {
   console.log("Decoded message:", message);
 
   return (
-    <div style={styles.container}>
+    <div className="verfiyError">
       <div style={styles.errorIcon}>⚠️</div>
-      <h1 style={styles.title}>Verification Failed</h1>
-      <div style={styles.messageContainer}>
-        <p style={styles.message}>{message.replace(/%/g, " ")}</p>
+      <h1 style={styles.title} className="v-title">Verification Failed</h1>
+      <div style={styles.messageContainer} className="v-message-container">
+        <p style={styles.message} className="v-message">{message.replace(/%/g, " ")}</p>
       </div>
-      <p style={styles.subMessage}>
+      <p style={styles.subMessage} className="v-sub-message">
         Please try again or contact support if the problem persists.
       </p>
       <div style={styles.buttonContainer}>
         <button 
           style={styles.button} 
+          className="v-button"
           onClick={() => navigate("/home")}
           onMouseOver={(e) => e.target.style.backgroundColor = "#2563eb"}
           onMouseOut={(e) => e.target.style.backgroundColor = "#3b82f6"}
@@ -49,6 +50,7 @@ export default function VerfiyError() {
         </button>
         <button 
           style={styles.buttonSecondary} 
+            className="v-button-secondary"
           onClick={() => navigate("/login")}
           onMouseOver={(e) => {
             e.target.style.backgroundColor = "#6b7280";
@@ -68,17 +70,7 @@ export default function VerfiyError() {
 
 // Enhanced styles for better error display
 const styles = {
-  container: {
-    minHeight: "80vh",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "2rem",
-    textAlign: "center",
-    backgroundColor: "#fef2f2",
-    fontFamily: "Poppins, sans-serif",
-  },
+
   errorIcon: {
     fontSize: "4rem",
     marginBottom: "1rem",
