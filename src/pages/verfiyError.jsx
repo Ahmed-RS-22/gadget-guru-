@@ -7,6 +7,7 @@ export default function VerfiyError() {
 
   // If you’re passing the error on as a query param, e.g. ?message=Something+went+wrong
   const params = new URLSearchParams(location);
+  console.log("Location search params:", params.toString());
   const message = params.get("message") || "An unexpected error has occurred.";
   console.log( "Error message:", message);
   
@@ -15,7 +16,7 @@ export default function VerfiyError() {
       <h1 style={styles.title}>Oops!</h1>
       <p style={styles.message}>{decodeURIComponent(message)}</p>
 
-      <button style={styles.button} onClick={() => navigate(-1)}>
+      <button style={styles.button} onClick={() => navigate("/home")}>
         Go Back
       </button>
     </div>
@@ -51,5 +52,6 @@ const styles = {
     border: "none",
     backgroundColor: "#1976D2",
     color: "#fff",
+    fontWeight: "bold",
   },
 };
